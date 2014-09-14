@@ -5,17 +5,25 @@
 
 		<link rel="stylesheet" type="text/css" href="css/meetup.css">
 		<link rel="stylesheet" type="text/css" href="css/bootstrap.min.css">
+
 	</head>
 	<body class="container" ng-controller="MeetupController as meetup">
     <form name="addressEntryForm" ng-controller="AddressEntryController as addressCtrl"
-            ng-submit="addressCtrl.addAddress(addresses)">
+            ng-submit="addressCtrl.addAddress(addresses); meetup.refresh">
         <fieldset class="form-group">
-            <input type="text" class="form-control" placeholder="Where are you coming from?" title="Address" ng-model="addressCtrl.address" />
+            <input type="text" id="addressInput" autofocus="true" class="form-control" placeholder="Where are you coming from?" title="Address" ng-model="addressCtrl.address" />
             <input type="submit" class="btn btn-primary pull-right" value="Go!" />
         </fieldset>
-        <blockquote ng-repeat="address in meetup.addresses">
-            {{address}}
-        </blockquote>
+        <ol>
+            <li ng-repeat="address in meetup.addresses">
+                {{address.formatted_address}}
+            </li>
+        </ol>
+
+        <div id="map_canvas" ng-controller="MapController as mapCtrl">
+            <google-map center="mapCtrl.map.center" zoom="mapCtrl.map.zoom"></google-map>
+        </div>
+
     </form>
 
     <br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/>
@@ -87,6 +95,8 @@
 
 		<script type="text/javascript" src="lib/angular.min.js"></script>
 		<script type="text/javascript" src="src-js/meetup.js"></script>
-
+        <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBxt6SwFT6CyZbFBC561_vf-CUEEq76Njk" ></script>
+        <script type="text/javascript" src="lib/lodash.underscore.min.js" ></script>
+        <script type="text/javascript" src="lib/angular-google-maps.min.js" ></script>
 	</body>
 </html>

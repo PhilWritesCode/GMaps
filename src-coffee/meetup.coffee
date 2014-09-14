@@ -1,14 +1,24 @@
-meetupApp = angular.module 'meetupApp', []
+meetupApp = angular.module 'meetupApp', ['google-maps']
 
 meetupApp.factory 'addressService', ->
+    @geocoder = new google.maps.Geocoder();
+
+    @processAddress = (address, addresses) ->
+        @geocoder.geocode {address: address}, (results, status)->
+            if status == google.maps.GeocoderStatus.OK
+                addresses.push(results[0])
+            else
+                alert("Failed!  Status: " + status)
+
     @addresses = []
 
     @getAddresses = ->
         @addresses
 
     @addAddress = (address) ->
-        @addresses.push(address)
-    {@addresses,@getAddresses,@addAddress}
+        if address && address not in @addresses
+            @processAddress address, @addresses
+    {@addresses,@getAddresses,@addAddress, @processAddress, @geocoder}
 
 
 meetupApp.controller 'MeetupController',  ($scope,addressService) ->
@@ -21,6 +31,28 @@ meetupApp.controller 'AddressEntryController',  ($scope,addressService) ->
     @addAddress = ->
         addressService.addAddress @address
         @address = "";
+
+meetupApp.controller 'MapController', ->
+    @map = {
+        center: {
+            latitude: 45,
+            longitude: -73
+        },
+        zoom: 7
+    };
+
+    @buildIcon = (iconURL) ->
+        {
+            anchor : new google.maps.Point(16, 32),
+            size : new google.maps.Size(32, 32),
+            url : iconURL
+        }
+
+    @icons = {
+        location : @buildIcon("https://maps.google.com/mapfiles/ms/icons/blue-dot.png"),
+        between  : @buildIcon("https://maps.google.com/mapfiles/ms/icons/green-dot.png"),
+        search   : @buildIcon("https://maps.google.com/mapfiles/ms/icons/yellow-dot.png")
+    };
 
 
 gems = [
