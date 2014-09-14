@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html ng-app="meetupApp">
+	<head>
+		<title>MidwayMeetup | Where Do You Wanna Meet Up?</title>
+
+		<link rel="stylesheet" type="text/css" href="css/meetup.css">
+		<link rel="stylesheet" type="text/css" href="css/bootstrap.min.css">
+	</head>
+	<body class="container" ng-controller="MeetupController as meetup">
+    <form name="addressEntryForm" ng-controller="AddressEntryController as addressCtrl"
+            ng-submit="addressCtrl.addAddress(addresses)">
+        <fieldset class="form-group">
+            <input type="text" class="form-control" placeholder="Where are you coming from?" title="Address" ng-model="addressCtrl.address" />
+            <input type="submit" class="btn btn-primary pull-right" value="Go!" />
+        </fieldset>
+        <blockquote ng-repeat="address in meetup.addresses">
+            {{address}}
+        </blockquote>
+    </form>
+
+    <br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/>
+    <h1>STORE STUFF</h1>
+    <br/><br/>
+
+        <div class="row" ng-repeat="product in meetup.products">
+            <h3>
+                {{product.name}}
+                <em class="pull-right">{{product.price | currency}}</em>
+            </h3>
+            <section ng-init="tab = 1" ng-controller="PanelController as panel">
+                <ul class="nav nav-pills">
+                    <li ng-class="{active:panel.isSelected(1)}">
+                        <a href ng-click="panel.selectTab(1)">Description</a>
+                    </li>
+                    <li ng-class="{active:panel.isSelected(2)}">
+                        <a href ng-click="panel.selectTab(2)">Specifications</a>
+                    </li>
+                    <li ng-class="{active:panel.isSelected(3)}">
+                        <a href ng-click="panel.selectTab(3)">Reviews</a>
+                    </li>
+                </ul>
+                <div class="panel" ng-show="panel.isSelected(1)">
+                    <h4>Description</h4>
+                    <p>{{product.description}}</p>
+                </div>
+                <div class="panel" ng-show="panel.isSelected(2)">
+                    <h4>Specifications</h4>
+                    <p>Nada </p>
+                </div>
+                <div class="panel" ng-show="panel.isSelected(3)">
+                    <h4>Reviews</h4>
+                    <blockquote ng-repeat="review in product.reviews">
+                        <b>Stars: {{review.stars}}</b>
+                        {{review.body}}
+                        <cite class="clearfix">by: {{review.author}}</cite>
+                    </blockquote>
+                    <form name="reviewForm" ng-controller="ReviewController as reviewCtrl"
+                            ng-submit="reviewCtrl.addReview(product)">
+                        <!--  Live Preview -->
+                        <blockquote>
+                            <strong>{{reviewCtrl.review.stars}} Stars</strong>
+                            {{reviewCtrl.review.body}}
+                            <cite class="clearfix">by: {{reviewCtrl.review.author}}</cite>
+                        </blockquote>
+                        <!--  Review Form -->
+                        <h4>Submit a Review</h4>
+                        <fieldset class="form-group">
+                            <select class="form-control" ng-options="stars for stars in [5,4,3,2,1]"  title="Stars" ng-model="reviewCtrl.review.stars">
+                                <option value="">Rate the Product</option>
+                            </select>
+                        </fieldset>
+                        <fieldset class="form-group">
+                            <textarea class="form-control" placeholder="Write a short review of the product..." title="Review" ng-model="reviewCtrl.review.body"></textarea>
+                        </fieldset>
+                        <fieldset class="form-group">
+                            <input type="email" class="form-control" placeholder="jimmyDean@example.org" title="Email" ng-model="reviewCtrl.review.author" />
+                        </fieldset>
+                        <fieldset class="form-group">
+                            <input type="submit" class="btn btn-primary pull-right" value="Submit Review" />
+                        </fieldset>
+                    </form>
+                </div>
+            </section>
+
+        </div>
+
+
+		<script type="text/javascript" src="lib/angular.min.js"></script>
+		<script type="text/javascript" src="src-js/meetup.js"></script>
+
+	</body>
+</html>
