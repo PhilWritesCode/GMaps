@@ -2,24 +2,24 @@ meetupApp = angular.module 'meetupApp', ['google-maps']
 
 meetupApp.factory 'locationService', ->
     @geocoder = new google.maps.Geocoder();
+    @locations = []
 
-    @processLocation = (location, locations) ->
+    @processLocation = (location, locations) =>
         @geocoder.geocode {address: location}, (results, status)->
             if status == google.maps.GeocoderStatus.OK
                 locations.push(results[0])
             else
                 alert("Failed!  Status: " + status)
 
-    @locations = []
-
-    @getLocations = ->
+    @getLocations = =>
         @locations
 
-    @addLocation = (location) ->
+    @addLocation = (location) =>
         if location && location not in @locations
             @processLocation location, @locations
+            //TODO: how can we stop passing @locations?
 
-    {@locations, @getLocations, @addLocation, @processLocation, @geocoder}
+    {@getLocations, @addLocation}
 
 
 meetupApp.controller 'MeetupController',  ($scope,locationService) ->

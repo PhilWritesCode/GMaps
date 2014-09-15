@@ -7,32 +7,35 @@
 
   meetupApp.factory('locationService', function() {
     this.geocoder = new google.maps.Geocoder();
-    this.processLocation = function(location, locations) {
-      return this.geocoder.geocode({
-        address: location
-      }, function(results, status) {
-        if (status === google.maps.GeocoderStatus.OK) {
-          return locations.push(results[0]);
-        } else {
-          return alert("Failed!  Status: " + status);
-        }
-      });
-    };
     this.locations = [];
-    this.getLocations = function() {
-      return this.locations;
-    };
-    this.addLocation = function(location) {
-      if (location && __indexOf.call(this.locations, location) < 0) {
-        return this.processLocation(location, this.locations);
-      }
-    };
+    this.processLocation = (function(_this) {
+      return function(location, locations) {
+        return _this.geocoder.geocode({
+          address: location
+        }, function(results, status) {
+          if (status === google.maps.GeocoderStatus.OK) {
+            return locations.push(results[0]);
+          } else {
+            return alert("Failed!  Status: " + status);
+          }
+        });
+      };
+    })(this);
+    this.getLocations = (function(_this) {
+      return function() {
+        return _this.locations;
+      };
+    })(this);
+    this.addLocation = (function(_this) {
+      return function(location) {
+        if (location && __indexOf.call(_this.locations, location) < 0) {
+          return _this.processLocation(location, _this.locations);
+        }
+      };
+    })(this);
     return {
-      locations: this.locations,
       getLocations: this.getLocations,
-      addLocation: this.addLocation,
-      processLocation: this.processLocation,
-      geocoder: this.geocoder
+      addLocation: this.addLocation
     };
   });
 
