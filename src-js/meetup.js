@@ -5,47 +5,47 @@
 
   meetupApp = angular.module('meetupApp', ['google-maps']);
 
-  meetupApp.factory('addressService', function() {
+  meetupApp.factory('locationService', function() {
     this.geocoder = new google.maps.Geocoder();
-    this.processAddress = function(address, addresses) {
+    this.processLocation = function(location, locations) {
       return this.geocoder.geocode({
-        address: address
+        address: location
       }, function(results, status) {
         if (status === google.maps.GeocoderStatus.OK) {
-          return addresses.push(results[0]);
+          return locations.push(results[0]);
         } else {
           return alert("Failed!  Status: " + status);
         }
       });
     };
-    this.addresses = [];
-    this.getAddresses = function() {
-      return this.addresses;
+    this.locations = [];
+    this.getLocations = function() {
+      return this.locations;
     };
-    this.addAddress = function(address) {
-      if (address && __indexOf.call(this.addresses, address) < 0) {
-        return this.processAddress(address, this.addresses);
+    this.addLocation = function(location) {
+      if (location && __indexOf.call(this.locations, location) < 0) {
+        return this.processLocation(location, this.locations);
       }
     };
     return {
-      addresses: this.addresses,
-      getAddresses: this.getAddresses,
-      addAddress: this.addAddress,
-      processAddress: this.processAddress,
+      locations: this.locations,
+      getLocations: this.getLocations,
+      addLocation: this.addLocation,
+      processLocation: this.processLocation,
       geocoder: this.geocoder
     };
   });
 
-  meetupApp.controller('MeetupController', function($scope, addressService) {
+  meetupApp.controller('MeetupController', function($scope, locationService) {
     this.products = gems;
-    return this.addresses = addressService.getAddresses();
+    return this.locations = locationService.getLocations();
   });
 
-  meetupApp.controller('AddressEntryController', function($scope, addressService) {
-    this.address;
-    return this.addAddress = function() {
-      addressService.addAddress(this.address);
-      return this.address = "";
+  meetupApp.controller('LocationEntryController', function($scope, locationService) {
+    this.location;
+    return this.addLocation = function() {
+      locationService.addLocation(this.location);
+      return this.location = "";
     };
   });
 

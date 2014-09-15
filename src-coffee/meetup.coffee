@@ -1,36 +1,37 @@
 meetupApp = angular.module 'meetupApp', ['google-maps']
 
-meetupApp.factory 'addressService', ->
+meetupApp.factory 'locationService', ->
     @geocoder = new google.maps.Geocoder();
 
-    @processAddress = (address, addresses) ->
-        @geocoder.geocode {address: address}, (results, status)->
+    @processLocation = (location, locations) ->
+        @geocoder.geocode {address: location}, (results, status)->
             if status == google.maps.GeocoderStatus.OK
-                addresses.push(results[0])
+                locations.push(results[0])
             else
                 alert("Failed!  Status: " + status)
 
-    @addresses = []
+    @locations = []
 
-    @getAddresses = ->
-        @addresses
+    @getLocations = ->
+        @locations
 
-    @addAddress = (address) ->
-        if address && address not in @addresses
-            @processAddress address, @addresses
-    {@addresses,@getAddresses,@addAddress, @processAddress, @geocoder}
+    @addLocation = (location) ->
+        if location && location not in @locations
+            @processLocation location, @locations
+
+    {@locations, @getLocations, @addLocation, @processLocation, @geocoder}
 
 
-meetupApp.controller 'MeetupController',  ($scope,addressService) ->
+meetupApp.controller 'MeetupController',  ($scope,locationService) ->
 	@products = gems
-	@addresses = addressService.getAddresses()
+	@locations = locationService.getLocations()
 
 
-meetupApp.controller 'AddressEntryController',  ($scope,addressService) ->
-    @address
-    @addAddress = ->
-        addressService.addAddress @address
-        @address = "";
+meetupApp.controller 'LocationEntryController',  ($scope,locationService) ->
+    @location
+    @addLocation = ->
+        locationService.addLocation @location
+        @location = "";
 
 meetupApp.controller 'MapController', ->
     @map = {

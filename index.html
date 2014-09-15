@@ -8,15 +8,15 @@
 
 	</head>
 	<body class="container" ng-controller="MeetupController as meetup">
-    <form name="addressEntryForm" ng-controller="AddressEntryController as addressCtrl"
-            ng-submit="addressCtrl.addAddress(addresses); meetup.refresh">
+    <form name="locationEntryForm" ng-controller="LocationEntryController as locationCtrl"
+            ng-submit="locationCtrl.addLocation()">
         <fieldset class="form-group">
-            <input type="text" id="addressInput" autofocus="true" class="form-control" placeholder="Where are you coming from?" title="Address" ng-model="addressCtrl.address" />
+            <input type="text" id="locationInput" autofocus="true" class="form-control" placeholder="Where are you coming from?" title="Location" ng-model="locationCtrl.location" />
             <input type="submit" class="btn btn-primary pull-right" value="Go!" />
         </fieldset>
         <ol>
-            <li ng-repeat="address in meetup.addresses">
-                {{address.formatted_address}}
+            <li ng-repeat="location in meetup.locations">
+                {{location.formatted_address}}
             </li>
         </ol>
 
