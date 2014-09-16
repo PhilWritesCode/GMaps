@@ -22,11 +22,22 @@
 
         <div id="map_canvas" ng-controller="MapController as mapCtrl">
             <google-map center="mapCtrl.map.center" zoom="mapCtrl.map.zoom">
-
+                <marker ng-repeat="loc in mapCtrl.locations" coords="{latitude: 40.1451,longitude: -99.6680}"  idkey="1" ></marker>
             </google-map>
         </div>
 
     </form>
+
+
+
+
+
+
+
+
+
+
+
 
     <br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/>
     <h1>STORE STUFF</h1>
@@ -97,8 +108,8 @@
 
 		<script type="text/javascript" src="lib/angular.min.js"></script>
 		<script type="text/javascript" src="src-js/meetup.js"></script>
-        <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBxt6SwFT6CyZbFBC561_vf-CUEEq76Njk" ></script>
+    <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBxt6SwFT6CyZbFBC561_vf-CUEEq76Njk" ></script>
         <script type="text/javascript" src="lib/lodash.underscore.min.js" ></script>
-        <script type="text/javascript" src="lib/angular-google-maps.min.js" ></script>
+        <script type="text/javascript" src="lib/angular-google-maps.js" ></script>
 	</body>
 </html>
