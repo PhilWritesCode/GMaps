@@ -4,20 +4,19 @@ meetupApp.factory 'locationService', ->
     @geocoder = new google.maps.Geocoder();
     @locations = []
 
-    @processLocation = (location, locations) =>
-        @geocoder.geocode {address: location}, (results, status)->
+    @processLocation = (location, locations, refresh) =>
+        @geocoder.geocode {address: location}, (results, status) ->
             if status == google.maps.GeocoderStatus.OK
                 locations.push(results[0])
+                refresh()
             else
                 alert("Failed!  Status: " + status)
 
     @getLocations = =>
         @locations
 
-    @addLocation = (location) =>
-        if location && location not in @locations
-            @processLocation location, @locations
-            //TODO: how can we stop passing @locations?
+    @addLocation = (location, refresh) =>
+        @processLocation location, @locations, refresh
 
     {@getLocations, @addLocation}
 
@@ -26,20 +25,36 @@ meetupApp.controller 'MeetupController',  ($scope,locationService) ->
 	@products = gems
 	@locations = locationService.getLocations()
 
-
 meetupApp.controller 'LocationEntryController',  ($scope,locationService) ->
-    @location
+    @formEntry
+    @usedEntries = []
     @addLocation = ->
-        locationService.addLocation @location
-        @location = "";
+        if @formEntry && @formEntry not in @usedEntries
+            locationService.addLocation @formEntry, @refresh
+            @usedEntries.push @formEntry
+        @formEntry = ""
 
-meetupApp.controller 'MapController', ->
+    @refresh = =>
+        $scope.$apply()
+
+meetupApp.controller 'MapController', ($scope,locationService) ->
+    @locations = locationService.getLocations()
+
     @map = {
         center: {
             latitude: 45,
             longitude: -73
         },
-        zoom: 7
+        zoom: 4
+    };
+
+    @marker = {
+        id:0,
+        coords: {
+            latitude: 40.1451,
+            longitude: -99.6680
+        },
+        options: { draggable: true }
     };
 
     @buildIcon = (iconURL) ->

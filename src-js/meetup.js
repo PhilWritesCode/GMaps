@@ -9,12 +9,13 @@
     this.geocoder = new google.maps.Geocoder();
     this.locations = [];
     this.processLocation = (function(_this) {
-      return function(location, locations) {
+      return function(location, locations, refresh) {
         return _this.geocoder.geocode({
           address: location
         }, function(results, status) {
           if (status === google.maps.GeocoderStatus.OK) {
-            return locations.push(results[0]);
+            locations.push(results[0]);
+            return refresh();
           } else {
             return alert("Failed!  Status: " + status);
           }
@@ -27,10 +28,8 @@
       };
     })(this);
     this.addLocation = (function(_this) {
-      return function(location) {
-        if (location && __indexOf.call(_this.locations, location) < 0) {
-          return _this.processLocation(location, _this.locations);
-        }
+      return function(location, refresh) {
+        return _this.processLocation(location, _this.locations, refresh);
       };
     })(this);
     return {
@@ -45,20 +44,41 @@
   });
 
   meetupApp.controller('LocationEntryController', function($scope, locationService) {
-    this.location;
-    return this.addLocation = function() {
-      locationService.addLocation(this.location);
-      return this.location = "";
+    this.formEntry;
+    this.usedEntries = [];
+    this.addLocation = function() {
+      var _ref;
+      if (this.formEntry && (_ref = this.formEntry, __indexOf.call(this.usedEntries, _ref) < 0)) {
+        locationService.addLocation(this.formEntry, this.refresh);
+        this.usedEntries.push(this.formEntry);
+      }
+      return this.formEntry = "";
     };
+    return this.refresh = (function(_this) {
+      return function() {
+        return $scope.$apply();
+      };
+    })(this);
   });
 
-  meetupApp.controller('MapController', function() {
+  meetupApp.controller('MapController', function($scope, locationService) {
+    this.locations = locationService.getLocations();
     this.map = {
       center: {
         latitude: 45,
         longitude: -73
       },
-      zoom: 7
+      zoom: 4
+    };
+    this.marker = {
+      id: 0,
+      coords: {
+        latitude: 40.1451,
+        longitude: -99.6680
+      },
+      options: {
+        draggable: true
+      }
     };
     this.buildIcon = function(iconURL) {
       return {

@@ -11,7 +11,7 @@
     <form name="locationEntryForm" ng-controller="LocationEntryController as locationCtrl"
             ng-submit="locationCtrl.addLocation()">
         <fieldset class="form-group">
-            <input type="text" id="locationInput" autofocus="true" class="form-control" placeholder="Where are you coming from?" title="Location" ng-model="locationCtrl.location" />
+            <input type="text" id="locationInput" autofocus="true" class="form-control" placeholder="Where are you coming from?" title="Location" ng-model="locationCtrl.formEntry" />
             <input type="submit" class="btn btn-primary pull-right" value="Go!" />
         </fieldset>
         <ol>
@@ -21,7 +21,9 @@
         </ol>
 
         <div id="map_canvas" ng-controller="MapController as mapCtrl">
-            <google-map center="mapCtrl.map.center" zoom="mapCtrl.map.zoom"></google-map>
+            <google-map center="mapCtrl.map.center" zoom="mapCtrl.map.zoom">
+
+            </google-map>
         </div>
 
     </form>
