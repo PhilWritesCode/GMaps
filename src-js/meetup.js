@@ -3,7 +3,7 @@
   var gems, meetupApp,
     __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; };
 
-  meetupApp = angular.module('meetupApp', ['google-maps']);
+  meetupApp = angular.module('meetupApp', ['AngularGM']);
 
   meetupApp.factory('locationService', function() {
     this.geocoder = new google.maps.Geocoder();
@@ -63,18 +63,19 @@
 
   meetupApp.controller('MapController', function($scope, locationService) {
     this.locations = locationService.getLocations();
-    this.map = {
-      center: {
-        latitude: 45,
-        longitude: -73
-      },
-      zoom: 4
+    $scope.center = new google.maps.LatLng(45, -73);
+    this.mapOptions = {
+      map: {
+        center: new google.maps.LatLng(45, -73),
+        zoom: 6,
+        mapTypeId: google.maps.MapTypeId.TERRAIN
+      }
     };
     this.marker = {
       id: 0,
       coords: {
-        latitude: 40.1451,
-        longitude: -99.6680
+        latitude: 45,
+        longitude: -73
       },
       options: {
         draggable: true

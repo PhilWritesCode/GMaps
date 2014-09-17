@@ -8,25 +8,30 @@
 
 	</head>
 	<body class="container" ng-controller="MeetupController as meetup">
-    <form name="locationEntryForm" ng-controller="LocationEntryController as locationCtrl"
-            ng-submit="locationCtrl.addLocation()">
-        <fieldset class="form-group">
-            <input type="text" id="locationInput" autofocus="true" class="form-control" placeholder="Where are you coming from?" title="Location" ng-model="locationCtrl.formEntry" />
-            <input type="submit" class="btn btn-primary pull-right" value="Go!" />
-        </fieldset>
-        <ol>
-            <li ng-repeat="location in meetup.locations">
-                {{location.formatted_address}}
-            </li>
-        </ol>
+        <form name="locationEntryForm" ng-controller="LocationEntryController as locationCtrl"
+                ng-submit="locationCtrl.addLocation()">
+            <fieldset class="form-group">
+                <input type="text" id="locationInput" autofocus="true" class="form-control" placeholder="Where are you?" title="Location" ng-model="locationCtrl.formEntry" />
+                <input type="submit" class="btn btn-primary pull-right" value="Go!" />
+            </fieldset>
+            <ol>
+                <li ng-repeat="location in meetup.locations">
+                    {{location.formatted_address}}
+                </li>
+            </ol>
 
+
+
+        </form>
         <div id="map_canvas" ng-controller="MapController as mapCtrl">
-            <google-map center="mapCtrl.map.center" zoom="mapCtrl.map.zoom">
-                <marker ng-repeat="loc in mapCtrl.locations" coords="{latitude: 40.1451,longitude: -99.6680}"  idkey="1" ></marker>
-            </google-map>
+            <gm-map gm-map-id="'simpleMap'" gm-map-options="mapCtrl.mapOptions.map" class="angular-google-map-container">
+                <gm-markers gm-objects="mapCtrl.locations"
+                            gm-id="object.formatted_address"
+                            gm-position="{lat: object.geometry.location.lat(), lng: object.geometry.location.lng()}"
+                            gm-marker-options="{draggable: true}">
+                </gm-markers>
+            </gm-map>
         </div>
-
-    </form>
 
 
 
@@ -108,8 +113,7 @@
 
 		<script type="text/javascript" src="lib/angular.min.js"></script>
 		<script type="text/javascript" src="src-js/meetup.js"></script>
-    <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBxt6SwFT6CyZbFBC561_vf-CUEEq76Njk" ></script>
-        <script type="text/javascript" src="lib/lodash.underscore.min.js" ></script>
-        <script type="text/javascript" src="lib/angular-google-maps.js" ></script>
+        <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBxt6SwFT6CyZbFBC561_vf-CUEEq76Njk" ></script>
+        <script type="text/javascript" src="lib/angular-gm.min.js"></script>
 	</body>
 </html>

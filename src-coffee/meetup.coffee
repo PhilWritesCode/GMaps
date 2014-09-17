@@ -1,4 +1,4 @@
-meetupApp = angular.module 'meetupApp', ['google-maps']
+meetupApp = angular.module 'meetupApp', ['AngularGM']
 
 meetupApp.factory 'locationService', ->
     @geocoder = new google.maps.Geocoder();
@@ -21,11 +21,11 @@ meetupApp.factory 'locationService', ->
     {@getLocations, @addLocation}
 
 
-meetupApp.controller 'MeetupController',  ($scope,locationService) ->
+meetupApp.controller 'MeetupController', ($scope,locationService) ->
 	@products = gems
 	@locations = locationService.getLocations()
 
-meetupApp.controller 'LocationEntryController',  ($scope,locationService) ->
+meetupApp.controller 'LocationEntryController', ($scope,locationService) ->
     @formEntry
     @usedEntries = []
     @addLocation = ->
@@ -40,19 +40,21 @@ meetupApp.controller 'LocationEntryController',  ($scope,locationService) ->
 meetupApp.controller 'MapController', ($scope,locationService) ->
     @locations = locationService.getLocations()
 
-    @map = {
-        center: {
-            latitude: 45,
-            longitude: -73
-        },
-        zoom: 4
+    $scope.center = new google.maps.LatLng(45, -73)
+
+    @mapOptions = {
+        map: {
+            center: new google.maps.LatLng(45, -73),
+            zoom: 6,
+            mapTypeId: google.maps.MapTypeId.TERRAIN
+        }
     };
 
     @marker = {
         id:0,
         coords: {
-            latitude: 40.1451,
-            longitude: -99.6680
+            latitude: 45,
+            longitude: -73
         },
         options: { draggable: true }
     };
@@ -69,7 +71,6 @@ meetupApp.controller 'MapController', ($scope,locationService) ->
         between  : @buildIcon("https://maps.google.com/mapfiles/ms/icons/green-dot.png"),
         search   : @buildIcon("https://maps.google.com/mapfiles/ms/icons/yellow-dot.png")
     };
-
 
 gems = [
 	{name: 'Dodecahedron', price: 2.95, description: 'Here is some nonsensical description text', reviews:[], canPurchase: true, soldOut: true},
