@@ -63,22 +63,12 @@
 
   meetupApp.controller('MapController', function($scope, locationService) {
     this.locations = locationService.getLocations();
-    $scope.center = new google.maps.LatLng(45, -73);
+    this.bounds = new google.maps.LatLngBounds();
     this.mapOptions = {
       map: {
-        center: new google.maps.LatLng(45, -73),
-        zoom: 6,
+        center: new google.maps.LatLng(39, -95),
+        zoom: 4,
         mapTypeId: google.maps.MapTypeId.TERRAIN
-      }
-    };
-    this.marker = {
-      id: 0,
-      coords: {
-        latitude: 45,
-        longitude: -73
-      },
-      options: {
-        draggable: true
       }
     };
     this.buildIcon = function(iconURL) {

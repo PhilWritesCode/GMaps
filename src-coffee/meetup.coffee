@@ -39,24 +39,14 @@ meetupApp.controller 'LocationEntryController', ($scope,locationService) ->
 
 meetupApp.controller 'MapController', ($scope,locationService) ->
     @locations = locationService.getLocations()
-
-    $scope.center = new google.maps.LatLng(45, -73)
+    @bounds = new google.maps.LatLngBounds()
 
     @mapOptions = {
         map: {
-            center: new google.maps.LatLng(45, -73),
-            zoom: 6,
+            center: new google.maps.LatLng(39, -95),
+            zoom: 4,
             mapTypeId: google.maps.MapTypeId.TERRAIN
         }
-    };
-
-    @marker = {
-        id:0,
-        coords: {
-            latitude: 45,
-            longitude: -73
-        },
-        options: { draggable: true }
     };
 
     @buildIcon = (iconURL) ->
