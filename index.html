@@ -8,32 +8,34 @@
 
 	</head>
 	<body class="container" ng-controller="MeetupController as meetup">
-        <form name="locationEntryForm" ng-controller="LocationEntryController as locationCtrl"
-                ng-submit="locationCtrl.addLocation()">
+        <form name="locationEntryForm"
+                ng-submit="meetup.processFormEntry()">
             <fieldset class="form-group">
-                <input type="text" id="locationInput" autofocus="true" class="form-control" placeholder="Where are you?" title="Location" ng-model="locationCtrl.formEntry" />
+                <input type="text" id="locationInput" autofocus="true" class="form-control" placeholder="Where are you?" title="Location" ng-model="meetup.formEntry" />
                 <input type="submit" class="btn btn-primary pull-right" value="Go!" />
             </fieldset>
-            <ol>
-                <li ng-repeat="location in meetup.locations">
-                    {{location.formatted_address}}
-                </li>
-            </ol>
-
-
-
         </form>
-        <div id="map_canvas" ng-controller="MapController as mapCtrl">
-            <gm-map gm-map-id="'simpleMap'" gm-map-options="mapCtrl.mapOptions.map" class="angular-google-map-container">
-                <gm-markers gm-objects="mapCtrl.locations"
+        <ol>
+            <li ng-repeat="location in meetup.locations">
+                {{location.formatted_address}}
+            </li>
+        </ol>
+        <div id="map_canvas" >
+            <gm-map gm-map-id="'simpleMap'" gm-bounds="'meetup.bounds'" gm-map-options="meetup.mapOptions.map" class="angular-google-map-container">
+                <gm-markers gm-objects="meetup.locations"
                             gm-id="object.formatted_address"
                             gm-position="{lat: object.geometry.location.lat(), lng: object.geometry.location.lng()}"
-                            gm-marker-options="{draggable: true}">
+                            gm-marker-options="">
                 </gm-markers>
-                <gm-markers gm-objects="mapCtrl.locations"
-                            gm-id="1"
-                            gm-position="{lat: 45, lng: -73}"
-                            gm-marker-options="{draggable: true}">
+                <gm-markers gm-objects="meetup.mapCenter"
+                            gm-id="CenterSpot"
+                            gm-position="{lat: meetup.mapCenter.lat(), lng: meetup.mapCenter.lng()}"
+                            gm-marker-options="meetup.mapCenterOptions">
+                </gm-markers>
+                <gm-markers gm-objects="meetup.searchResults"
+                            gm-id="object.formatted_address"
+                            gm-position="{lat: object.geometry.location.lat(), lng: object.geometry.location.lng()}"
+                            gm-marker-options="meetup.searchResultOptions">
                 </gm-markers>
             </gm-map>
         </div>
@@ -118,7 +120,8 @@
 
 		<script type="text/javascript" src="lib/angular.min.js"></script>
 		<script type="text/javascript" src="src-js/meetup.js"></script>
-        <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBxt6SwFT6CyZbFBC561_vf-CUEEq76Njk" ></script>
+        <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBxt6SwFT6CyZbFBC561_vf-CUEEq76Njk&libraries=places&sensor=false" ></script>
         <script type="text/javascript" src="lib/angular-gm.min.js"></script>
+        <script type="text/javascript" src="lib/angularjs-google-places.min.js"></script>
 	</body>
 </html>

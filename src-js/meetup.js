@@ -3,67 +3,56 @@
   var gems, meetupApp,
     __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; };
 
-  meetupApp = angular.module('meetupApp', ['AngularGM']);
+  meetupApp = angular.module('meetupApp', ['AngularGM', 'ngGPlaces']);
 
   meetupApp.factory('locationService', function() {
     this.geocoder = new google.maps.Geocoder();
-    this.locations = [];
     this.processLocation = (function(_this) {
-      return function(location, locations, refresh) {
+      return function(newLocation, addLocation) {
         return _this.geocoder.geocode({
-          address: location
+          address: newLocation
         }, function(results, status) {
           if (status === google.maps.GeocoderStatus.OK) {
-            locations.push(results[0]);
-            return refresh();
+            return addLocation(results[0]);
           } else {
             return alert("Failed!  Status: " + status);
           }
         });
       };
     })(this);
-    this.getLocations = (function(_this) {
-      return function() {
-        return _this.locations;
-      };
-    })(this);
-    this.addLocation = (function(_this) {
-      return function(location, refresh) {
-        return _this.processLocation(location, _this.locations, refresh);
-      };
-    })(this);
     return {
-      getLocations: this.getLocations,
-      addLocation: this.addLocation
+      processLocation: this.processLocation
     };
   });
 
-  meetupApp.controller('MeetupController', function($scope, locationService) {
+  meetupApp.controller('MeetupController', function($scope, ngGPlacesAPI, locationService) {
     this.products = gems;
-    return this.locations = locationService.getLocations();
-  });
-
-  meetupApp.controller('LocationEntryController', function($scope, locationService) {
+    this.locations = [];
+    this.bounds = new google.maps.LatLngBounds();
+    this.mapCenter;
+    this.mapCenterVisible = false;
+    this.searchResults;
     this.formEntry;
     this.usedEntries = [];
-    this.addLocation = function() {
+    this.processFormEntry = function() {
       var _ref;
       if (this.formEntry && (_ref = this.formEntry, __indexOf.call(this.usedEntries, _ref) < 0)) {
-        locationService.addLocation(this.formEntry, this.refresh);
+        locationService.processLocation(this.formEntry, this.addLocation);
         this.usedEntries.push(this.formEntry);
       }
       return this.formEntry = "";
     };
-    return this.refresh = (function(_this) {
-      return function() {
+    this.addLocation = (function(_this) {
+      return function(newLocation) {
+        _this.locations.push(newLocation);
+        _this.bounds.extend(newLocation.geometry.location);
+        console.log(_this.bounds.toString());
+        _this.mapCenter = _this.bounds.getCenter();
+        _this.mapCenterOptions.visible = _this.locations.length > 1;
+        $scope.$broadcast('gmMapResize', 'simpleMap');
         return $scope.$apply();
       };
     })(this);
-  });
-
-  meetupApp.controller('MapController', function($scope, locationService) {
-    this.locations = locationService.getLocations();
-    this.bounds = new google.maps.LatLngBounds();
     this.mapOptions = {
       map: {
         center: new google.maps.LatLng(39, -95),
@@ -71,6 +60,18 @@
         mapTypeId: google.maps.MapTypeId.TERRAIN
       }
     };
+    this.mapCenterOptions = {
+      draggable: true,
+      visible: false,
+      icon: "https://maps.google.com/mapfiles/ms/icons/green-dot.png"
+    };
+    return this.searchResultOptions = {
+      draggable: false,
+      icon: "https://maps.google.com/mapfiles/ms/icons/yellow-dot.png"
+    };
+  });
+
+  meetupApp.controller('MapController', function($scope, locationService) {
     this.buildIcon = function(iconURL) {
       return {
         anchor: new google.maps.Point(16, 32),

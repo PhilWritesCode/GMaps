@@ -1,53 +1,56 @@
-meetupApp = angular.module 'meetupApp', ['AngularGM']
+meetupApp = angular.module 'meetupApp', ['AngularGM','ngGPlaces']
 
 meetupApp.factory 'locationService', ->
     @geocoder = new google.maps.Geocoder();
-    @locations = []
 
-    @processLocation = (location, locations, refresh) =>
-        @geocoder.geocode {address: location}, (results, status) ->
+    @processLocation = (newLocation, addLocation) =>
+        @geocoder.geocode {address: newLocation}, (results, status) ->
             if status == google.maps.GeocoderStatus.OK
-                locations.push(results[0])
-                refresh()
+                addLocation(results[0])
             else
                 alert("Failed!  Status: " + status)
 
-    @getLocations = =>
-        @locations
-
-    @addLocation = (location, refresh) =>
-        @processLocation location, @locations, refresh
-
-    {@getLocations, @addLocation}
+    {@processLocation}
 
 
-meetupApp.controller 'MeetupController', ($scope,locationService) ->
+meetupApp.controller 'MeetupController', ($scope,ngGPlacesAPI, locationService) ->
 	@products = gems
-	@locations = locationService.getLocations()
+	@locations = []
+	@bounds = new google.maps.LatLngBounds()
+	@mapCenter
+	@mapCenterVisible = false
+	@searchResults
 
-meetupApp.controller 'LocationEntryController', ($scope,locationService) ->
-    @formEntry
-    @usedEntries = []
-    @addLocation = ->
+
+	@formEntry
+	@usedEntries = []
+
+	@processFormEntry = ->
         if @formEntry && @formEntry not in @usedEntries
-            locationService.addLocation @formEntry, @refresh
+            locationService.processLocation @formEntry, @addLocation
             @usedEntries.push @formEntry
         @formEntry = ""
 
-    @refresh = =>
-        $scope.$apply()
+	@addLocation = (newLocation) =>
+		@locations.push(newLocation)
+		@bounds.extend(newLocation.geometry.location)
+		console.log @bounds.toString()
+		@mapCenter = @bounds.getCenter()
+		@mapCenterOptions.visible = @locations.length > 1
+
+		$scope.$broadcast('gmMapResize', 'simpleMap')
+		$scope.$apply()
+
+
+
+	@mapOptions = {map: {center: new google.maps.LatLng(39, -95),zoom: 4,mapTypeId: google.maps.MapTypeId.TERRAIN}};
+	@mapCenterOptions = {draggable: true, visible: false, icon:"https://maps.google.com/mapfiles/ms/icons/green-dot.png"}
+	@searchResultOptions = {draggable: false, icon:"https://maps.google.com/mapfiles/ms/icons/yellow-dot.png"}
+
 
 meetupApp.controller 'MapController', ($scope,locationService) ->
-    @locations = locationService.getLocations()
-    @bounds = new google.maps.LatLngBounds()
 
-    @mapOptions = {
-        map: {
-            center: new google.maps.LatLng(39, -95),
-            zoom: 4,
-            mapTypeId: google.maps.MapTypeId.TERRAIN
-        }
-    };
+
 
     @buildIcon = (iconURL) ->
         {
