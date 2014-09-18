@@ -51,7 +51,7 @@
 
 
 
-    <br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/>
+   <!-- <br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/>
     <h1>STORE STUFF</h1>
     <br/><br/>
 
@@ -89,13 +89,13 @@
                     </blockquote>
                     <form name="reviewForm" ng-controller="ReviewController as reviewCtrl"
                             ng-submit="reviewCtrl.addReview(product)">
-                        <!--  Live Preview -->
+
                         <blockquote>
                             <strong>{{reviewCtrl.review.stars}} Stars</strong>
                             {{reviewCtrl.review.body}}
                             <cite class="clearfix">by: {{reviewCtrl.review.author}}</cite>
                         </blockquote>
-                        <!--  Review Form -->
+
                         <h4>Submit a Review</h4>
                         <fieldset class="form-group">
                             <select class="form-control" ng-options="stars for stars in [5,4,3,2,1]"  title="Stars" ng-model="reviewCtrl.review.stars">
@@ -116,7 +116,7 @@
             </section>
 
         </div>
-
+    -->
 
 		<script type="text/javascript" src="lib/angular.min.js"></script>
 		<script type="text/javascript" src="src-js/meetup.js"></script>
