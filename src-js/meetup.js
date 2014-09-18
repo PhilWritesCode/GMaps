@@ -45,25 +45,21 @@
     this.addLocation = (function(_this) {
       return function(newLocation) {
         _this.locations.push(newLocation);
-        _this.updateBounds();
-        console.log(_this.bounds.toString());
-        _this.mapCenter = _this.bounds.getCenter();
-        _this.mapCenterOptions.visible = _this.locations.length > 1;
-        $scope.$broadcast('gmMapResize', 'simpleMap');
+        _this.updateMap();
         return $scope.$apply();
       };
     })(this);
-    this.updateBounds = (function(_this) {
+    this.updateMap = (function(_this) {
       return function() {
-        var location, _i, _len, _ref, _results;
+        var location, _i, _len, _ref;
         _this.bounds = new google.maps.LatLngBounds();
         _ref = _this.locations;
-        _results = [];
         for (_i = 0, _len = _ref.length; _i < _len; _i++) {
           location = _ref[_i];
-          _results.push(_this.bounds.extend(location.geometry.location));
+          _this.bounds.extend(location.geometry.location);
         }
-        return _results;
+        _this.mapCenter = _this.bounds.getCenter();
+        return _this.mapCenterOptions.visible = _this.locations.length > 1;
       };
     })(this);
     this.mapOptions = {

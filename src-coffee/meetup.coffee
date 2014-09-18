@@ -31,18 +31,15 @@ meetupApp.controller 'MeetupController', ($scope,ngGPlacesAPI, locationService) 
 
 	@addLocation = (newLocation) =>
 		@locations.push(newLocation)
-		@updateBounds()
-		console.log @bounds.toString()
-		@mapCenter = @bounds.getCenter()
-		@mapCenterOptions.visible = @locations.length > 1
-
-		$scope.$broadcast('gmMapResize', 'simpleMap')
+		@updateMap()
 		$scope.$apply()
 
-	@updateBounds = =>
+	@updateMap = =>
 		@bounds = new google.maps.LatLngBounds()
 		for location in @locations
 			@bounds.extend(location.geometry.location)
+		@mapCenter = @bounds.getCenter()
+		@mapCenterOptions.visible = @locations.length > 1
 
 	@mapOptions = {map: {center: new google.maps.LatLng(39, -95),zoom: 4,mapTypeId: google.maps.MapTypeId.TERRAIN}};
 	@mapCenterOptions = {draggable: true, visible: false, icon:"https://maps.google.com/mapfiles/ms/icons/green-dot.png"}
