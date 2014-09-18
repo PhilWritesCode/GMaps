@@ -21,7 +21,7 @@
             </li>
         </ol>
         <div id="map_canvas" >
-            <gm-map gm-map-id="'simpleMap'" gm-bounds="'meetup.bounds'" gm-map-options="meetup.mapOptions.map" class="angular-google-map-container">
+            <gm-map gm-map-id="'simpleMap'" gm-bounds="meetup.bounds" gm-map-options="meetup.mapOptions.map" class="angular-google-map-container">
                 <gm-markers gm-objects="meetup.locations"
                             gm-id="object.formatted_address"
                             gm-position="{lat: object.geometry.location.lat(), lng: object.geometry.location.lng()}"

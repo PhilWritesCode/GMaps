@@ -45,12 +45,25 @@
     this.addLocation = (function(_this) {
       return function(newLocation) {
         _this.locations.push(newLocation);
-        _this.bounds.extend(newLocation.geometry.location);
+        _this.updateBounds();
         console.log(_this.bounds.toString());
         _this.mapCenter = _this.bounds.getCenter();
         _this.mapCenterOptions.visible = _this.locations.length > 1;
         $scope.$broadcast('gmMapResize', 'simpleMap');
         return $scope.$apply();
+      };
+    })(this);
+    this.updateBounds = (function(_this) {
+      return function() {
+        var location, _i, _len, _ref, _results;
+        _this.bounds = new google.maps.LatLngBounds();
+        _ref = _this.locations;
+        _results = [];
+        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+          location = _ref[_i];
+          _results.push(_this.bounds.extend(location.geometry.location));
+        }
+        return _results;
       };
     })(this);
     this.mapOptions = {
@@ -68,21 +81,6 @@
     return this.searchResultOptions = {
       draggable: false,
       icon: "https://maps.google.com/mapfiles/ms/icons/yellow-dot.png"
-    };
-  });
-
-  meetupApp.controller('MapController', function($scope, locationService) {
-    this.buildIcon = function(iconURL) {
-      return {
-        anchor: new google.maps.Point(16, 32),
-        size: new google.maps.Size(32, 32),
-        url: iconURL
-      };
-    };
-    return this.icons = {
-      location: this.buildIcon("https://maps.google.com/mapfiles/ms/icons/blue-dot.png"),
-      between: this.buildIcon("https://maps.google.com/mapfiles/ms/icons/green-dot.png"),
-      search: this.buildIcon("https://maps.google.com/mapfiles/ms/icons/yellow-dot.png")
     };
   });
 

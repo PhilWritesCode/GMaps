@@ -20,8 +20,6 @@ meetupApp.controller 'MeetupController', ($scope,ngGPlacesAPI, locationService) 
 	@mapCenter
 	@mapCenterVisible = false
 	@searchResults
-
-
 	@formEntry
 	@usedEntries = []
 
@@ -33,7 +31,7 @@ meetupApp.controller 'MeetupController', ($scope,ngGPlacesAPI, locationService) 
 
 	@addLocation = (newLocation) =>
 		@locations.push(newLocation)
-		@bounds.extend(newLocation.geometry.location)
+		@updateBounds()
 		console.log @bounds.toString()
 		@mapCenter = @bounds.getCenter()
 		@mapCenterOptions.visible = @locations.length > 1
@@ -41,29 +39,19 @@ meetupApp.controller 'MeetupController', ($scope,ngGPlacesAPI, locationService) 
 		$scope.$broadcast('gmMapResize', 'simpleMap')
 		$scope.$apply()
 
-
+	@updateBounds = =>
+		@bounds = new google.maps.LatLngBounds()
+		for location in @locations
+			@bounds.extend(location.geometry.location)
 
 	@mapOptions = {map: {center: new google.maps.LatLng(39, -95),zoom: 4,mapTypeId: google.maps.MapTypeId.TERRAIN}};
 	@mapCenterOptions = {draggable: true, visible: false, icon:"https://maps.google.com/mapfiles/ms/icons/green-dot.png"}
 	@searchResultOptions = {draggable: false, icon:"https://maps.google.com/mapfiles/ms/icons/yellow-dot.png"}
 
 
-meetupApp.controller 'MapController', ($scope,locationService) ->
 
 
 
-    @buildIcon = (iconURL) ->
-        {
-            anchor : new google.maps.Point(16, 32),
-            size : new google.maps.Size(32, 32),
-            url : iconURL
-        }
-
-    @icons = {
-        location : @buildIcon("https://maps.google.com/mapfiles/ms/icons/blue-dot.png"),
-        between  : @buildIcon("https://maps.google.com/mapfiles/ms/icons/green-dot.png"),
-        search   : @buildIcon("https://maps.google.com/mapfiles/ms/icons/yellow-dot.png")
-    };
 
 gems = [
 	{name: 'Dodecahedron', price: 2.95, description: 'Here is some nonsensical description text', reviews:[], canPurchase: true, soldOut: true},
