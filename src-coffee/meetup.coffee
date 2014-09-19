@@ -1,8 +1,8 @@
 meetupApp = angular.module 'meetupApp', ['AngularGM','ngGPlaces']
 
 meetupApp.factory 'locationService', ->
-	@geocoder = new google.maps.Geocoder();
-	@searcher = new google.maps.places.PlacesService(document.getElementById('results'));
+	@geocoder = new google.maps.Geocoder()
+	@searcher = new google.maps.places.PlacesService document.getElementById 'results'
 
 	@processLocation = (newLocation, addLocation) =>
 		@geocoder.geocode {address: newLocation}, (results, status) ->
@@ -12,7 +12,7 @@ meetupApp.factory 'locationService', ->
 				alert("Failed!  Status: " + status)
 
 	@performSearch = (searchArea, searchTerm, displayResults) =>
-		@searcher.textSearch {query : searchTerm, location : searchArea, radius: 500},(results, status) ->
+		@searcher.textSearch {query : searchTerm, location : searchArea, radius: 5},(results, status) ->
 			if status == google.maps.places.PlacesServiceStatus.ZERO_RESULTS
 				alert 'No results!'
 				return
@@ -30,7 +30,7 @@ meetupApp.controller 'MeetupController', ($scope,ngGPlacesAPI, locationService) 
 	@searchResults
 	@formEntry
 	@usedEntries = []
-	@searchTerm
+	@searchTerm = "coffee"
 	@searchResults
 
 	@processFormEntry = ->
@@ -52,6 +52,10 @@ meetupApp.controller 'MeetupController', ($scope,ngGPlacesAPI, locationService) 
 		@mapCenter = @bounds.getCenter()
 		@mapCenterOptions.visible = @locations.length > 1
 
+	@updateCenter = (object, marker) ->
+		@mapCenter = marker.getPosition()
+		@performSearch()
+
 	@performSearch = =>
 		if !@searchTerm
 			return
@@ -59,7 +63,7 @@ meetupApp.controller 'MeetupController', ($scope,ngGPlacesAPI, locationService) 
 
 	@displayResults = (results) =>
 		console.log("results: " + results)
-		@searchResults = results
+		@searchResults = results.slice(0,10)
 		$scope.$apply()
 
 	@mapOptions = {map: {center: new google.maps.LatLng(39, -95),zoom: 4,mapTypeId: google.maps.MapTypeId.TERRAIN}};

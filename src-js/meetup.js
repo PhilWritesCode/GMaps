@@ -26,7 +26,7 @@
         return _this.searcher.textSearch({
           query: searchTerm,
           location: searchArea,
-          radius: 500
+          radius: 5
         }, function(results, status) {
           if (status === google.maps.places.PlacesServiceStatus.ZERO_RESULTS) {
             alert('No results!');
@@ -51,7 +51,7 @@
     this.searchResults;
     this.formEntry;
     this.usedEntries = [];
-    this.searchTerm;
+    this.searchTerm = "coffee";
     this.searchResults;
     this.processFormEntry = function() {
       var _ref;
@@ -82,6 +82,10 @@
         return _this.mapCenterOptions.visible = _this.locations.length > 1;
       };
     })(this);
+    this.updateCenter = function(object, marker) {
+      this.mapCenter = marker.getPosition();
+      return this.performSearch();
+    };
     this.performSearch = (function(_this) {
       return function() {
         if (!_this.searchTerm) {
@@ -93,7 +97,7 @@
     this.displayResults = (function(_this) {
       return function(results) {
         console.log("results: " + results);
-        _this.searchResults = results;
+        _this.searchResults = results.slice(0, 10);
         return $scope.$apply();
       };
     })(this);

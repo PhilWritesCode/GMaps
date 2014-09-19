@@ -30,7 +30,8 @@
                 <gm-markers gm-objects="meetup.mapCenter"
                             gm-id="CenterSpot"
                             gm-position="{lat: meetup.mapCenter.lat(), lng: meetup.mapCenter.lng()}"
-                            gm-marker-options="meetup.mapCenterOptions">
+                            gm-marker-options="meetup.mapCenterOptions"
+                            gm-on-dragend="meetup.updateCenter(object, marker)">
                 </gm-markers>
                 <gm-markers gm-objects="meetup.searchResults"
                             gm-id="object.formatted_address"
@@ -42,7 +43,7 @@
         <form name="searchForm"
               ng-submit="meetup.performSearch()">
             <fieldset class="form-group">
-                <input type="text" id="searchInput" autofocus="true" class="form-control" placeholder="What do you want to do?" title="SearchTerm" ng-model="meetup.searchTerm" />
+                <input type="text" id="searchInput" autofocus="true" class="form-control" placeholder="What do you want to do?" title="SearchTerm" ng-model="meetup.searchTerm"/>
                 <input type="submit" class="btn-small btn-primary pull-right" value="Go!" />
             </fieldset>
         </form>
