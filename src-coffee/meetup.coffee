@@ -1,16 +1,24 @@
 meetupApp = angular.module 'meetupApp', ['AngularGM','ngGPlaces']
 
 meetupApp.factory 'locationService', ->
-    @geocoder = new google.maps.Geocoder();
+	@geocoder = new google.maps.Geocoder();
+	@searcher = new google.maps.places.PlacesService(document.getElementById('results'));
 
-    @processLocation = (newLocation, addLocation) =>
-        @geocoder.geocode {address: newLocation}, (results, status) ->
-            if status == google.maps.GeocoderStatus.OK
-                addLocation(results[0])
-            else
-                alert("Failed!  Status: " + status)
+	@processLocation = (newLocation, addLocation) =>
+		@geocoder.geocode {address: newLocation}, (results, status) ->
+			if status == google.maps.GeocoderStatus.OK
+				addLocation results[0]
+			else
+				alert("Failed!  Status: " + status)
 
-    {@processLocation}
+	@performSearch = (searchArea, searchTerm, displayResults) =>
+		@searcher.textSearch {query : searchTerm, location : searchArea, radius: 500},(results, status) ->
+			if status == google.maps.places.PlacesServiceStatus.ZERO_RESULTS
+				alert 'No results!'
+				return
+			displayResults results
+
+	{@processLocation, @performSearch}
 
 
 meetupApp.controller 'MeetupController', ($scope,ngGPlacesAPI, locationService) ->
@@ -22,24 +30,37 @@ meetupApp.controller 'MeetupController', ($scope,ngGPlacesAPI, locationService) 
 	@searchResults
 	@formEntry
 	@usedEntries = []
+	@searchTerm
+	@searchResults
 
 	@processFormEntry = ->
-        if @formEntry && @formEntry not in @usedEntries
-            locationService.processLocation @formEntry, @addLocation
-            @usedEntries.push @formEntry
-        @formEntry = ""
+		if @formEntry && @formEntry not in @usedEntries
+			locationService.processLocation @formEntry, @addLocation
+			@usedEntries.push @formEntry
+		@formEntry = ""
 
 	@addLocation = (newLocation) =>
-		@locations.push(newLocation)
+		@locations.push newLocation
 		@updateMap()
+		@performSearch()
 		$scope.$apply()
 
 	@updateMap = =>
 		@bounds = new google.maps.LatLngBounds()
 		for location in @locations
-			@bounds.extend(location.geometry.location)
+			@bounds.extend location.geometry.location
 		@mapCenter = @bounds.getCenter()
 		@mapCenterOptions.visible = @locations.length > 1
+
+	@performSearch = =>
+		if !@searchTerm
+			return
+		locationService.performSearch @mapCenter, @searchTerm, @displayResults
+
+	@displayResults = (results) =>
+		console.log("results: " + results)
+		@searchResults = results
+		$scope.$apply()
 
 	@mapOptions = {map: {center: new google.maps.LatLng(39, -95),zoom: 4,mapTypeId: google.maps.MapTypeId.TERRAIN}};
 	@mapCenterOptions = {draggable: true, visible: false, icon:"https://maps.google.com/mapfiles/ms/icons/green-dot.png"}
@@ -57,14 +78,14 @@ gems = [
 ]
 
 meetupApp.controller 'PanelController', ->
-    @tab = 1
-    @selectTab = (setTab) ->
-        @tab = setTab
-    @isSelected = (checkTab) ->
-        @tab == checkTab
+	@tab = 1
+	@selectTab = (setTab) ->
+		@tab = setTab
+	@isSelected = (checkTab) ->
+		@tab == checkTab
 
 meetupApp.controller 'ReviewController', ->
-    @review = {}
-    @addReview = (address) ->
-        address.reviews.push(@review)
-        @review = {}
+	@review = {}
+	@addReview = (address) ->
+		address.reviews.push(@review)
+		@review = {}

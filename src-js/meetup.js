@@ -7,6 +7,7 @@
 
   meetupApp.factory('locationService', function() {
     this.geocoder = new google.maps.Geocoder();
+    this.searcher = new google.maps.places.PlacesService(document.getElementById('results'));
     this.processLocation = (function(_this) {
       return function(newLocation, addLocation) {
         return _this.geocoder.geocode({
@@ -20,8 +21,24 @@
         });
       };
     })(this);
+    this.performSearch = (function(_this) {
+      return function(searchArea, searchTerm, displayResults) {
+        return _this.searcher.textSearch({
+          query: searchTerm,
+          location: searchArea,
+          radius: 500
+        }, function(results, status) {
+          if (status === google.maps.places.PlacesServiceStatus.ZERO_RESULTS) {
+            alert('No results!');
+            return;
+          }
+          return displayResults(results);
+        });
+      };
+    })(this);
     return {
-      processLocation: this.processLocation
+      processLocation: this.processLocation,
+      performSearch: this.performSearch
     };
   });
 
@@ -34,6 +51,8 @@
     this.searchResults;
     this.formEntry;
     this.usedEntries = [];
+    this.searchTerm;
+    this.searchResults;
     this.processFormEntry = function() {
       var _ref;
       if (this.formEntry && (_ref = this.formEntry, __indexOf.call(this.usedEntries, _ref) < 0)) {
@@ -46,6 +65,7 @@
       return function(newLocation) {
         _this.locations.push(newLocation);
         _this.updateMap();
+        _this.performSearch();
         return $scope.$apply();
       };
     })(this);
@@ -60,6 +80,21 @@
         }
         _this.mapCenter = _this.bounds.getCenter();
         return _this.mapCenterOptions.visible = _this.locations.length > 1;
+      };
+    })(this);
+    this.performSearch = (function(_this) {
+      return function() {
+        if (!_this.searchTerm) {
+          return;
+        }
+        return locationService.performSearch(_this.mapCenter, _this.searchTerm, _this.displayResults);
+      };
+    })(this);
+    this.displayResults = (function(_this) {
+      return function(results) {
+        console.log("results: " + results);
+        _this.searchResults = results;
+        return $scope.$apply();
       };
     })(this);
     this.mapOptions = {

@@ -12,7 +12,7 @@
                 ng-submit="meetup.processFormEntry()">
             <fieldset class="form-group">
                 <input type="text" id="locationInput" autofocus="true" class="form-control" placeholder="Where are you?" title="Location" ng-model="meetup.formEntry" />
-                <input type="submit" class="btn btn-primary pull-right" value="Go!" />
+                <input type="submit" class="btn-small btn-primary pull-right" value="Go!" />
             </fieldset>
         </form>
         <ol>
@@ -39,6 +39,20 @@
                 </gm-markers>
             </gm-map>
         </div>
+        <form name="searchForm"
+              ng-submit="meetup.performSearch()">
+            <fieldset class="form-group">
+                <input type="text" id="searchInput" autofocus="true" class="form-control" placeholder="What do you want to do?" title="SearchTerm" ng-model="meetup.searchTerm" />
+                <input type="submit" class="btn-small btn-primary pull-right" value="Go!" />
+            </fieldset>
+        </form>
+        <ol>
+            <li ng-repeat="result in meetup.searchResults">
+                {{result.name}}<br/>
+                {{result.formatted_address}}
+            </li>
+        </ol>
+        <div id="results"></div>
 
 
 
