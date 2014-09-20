@@ -9,9 +9,10 @@
     this.geocoder = new google.maps.Geocoder();
     this.searcher = new google.maps.places.PlacesService(document.getElementById('results'));
     this.processLocation = (function(_this) {
-      return function(newLocation, addLocation) {
+      return function(newLocation, startingLocation, addLocation) {
         return _this.geocoder.geocode({
-          address: newLocation
+          address: newLocation,
+          location: startingLocation
         }, function(results, status) {
           if (status === google.maps.GeocoderStatus.OK) {
             return addLocation(results[0]);
@@ -27,7 +28,7 @@
           query: searchTerm,
           location: searchArea,
           radius: 5
-        }, function(results, status) {
+        }, function(results, status, pagination) {
           if (status === google.maps.places.PlacesServiceStatus.ZERO_RESULTS) {
             alert('No results!');
             return;
@@ -46,8 +47,7 @@
     this.products = gems;
     this.locations = [];
     this.bounds = new google.maps.LatLngBounds();
-    this.mapCenter;
-    this.mapCenterVisible = false;
+    this.centerOfSearchArea;
     this.searchResults;
     this.formEntry;
     this.usedEntries = [];
@@ -56,7 +56,7 @@
     this.processFormEntry = function() {
       var _ref;
       if (this.formEntry && (_ref = this.formEntry, __indexOf.call(this.usedEntries, _ref) < 0)) {
-        locationService.processLocation(this.formEntry, this.addLocation);
+        locationService.processLocation(this.formEntry, this.centerOfSearchArea, this.addLocation);
         this.usedEntries.push(this.formEntry);
       }
       return this.formEntry = "";
@@ -69,34 +69,43 @@
         return $scope.$apply();
       };
     })(this);
+    this.removeLocation = function(locationToRemove) {
+      this.locations.pop(locationToRemove);
+      this.usedEntries.pop(locationToRemove);
+      this.updateMap();
+      return this.performSearch();
+    };
     this.updateMap = (function(_this) {
       return function() {
         var location, _i, _len, _ref;
-        _this.bounds = new google.maps.LatLngBounds();
-        _ref = _this.locations;
-        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-          location = _ref[_i];
-          _this.bounds.extend(location.geometry.location);
+        if (_this.locations.length > 0) {
+          _this.bounds = new google.maps.LatLngBounds();
+          _ref = _this.locations;
+          for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+            location = _ref[_i];
+            _this.bounds.extend(location.geometry.location);
+          }
+          return _this.centerOfSearchArea = _this.bounds.getCenter();
+        } else {
+          return _this.centerOfSearchArea = null;
         }
-        _this.mapCenter = _this.bounds.getCenter();
-        return _this.mapCenterOptions.visible = _this.locations.length > 1;
       };
     })(this);
-    this.updateCenter = function(object, marker) {
-      this.mapCenter = marker.getPosition();
+    this.updateSearchArea = function(object, marker) {
+      this.centerOfSearchArea = marker.getPosition();
       return this.performSearch();
     };
     this.performSearch = (function(_this) {
       return function() {
-        if (!_this.searchTerm) {
+        if (!_this.searchTerm || _this.locations.length === 0) {
+          _this.searchResults = [];
           return;
         }
-        return locationService.performSearch(_this.mapCenter, _this.searchTerm, _this.displayResults);
+        return locationService.performSearch(_this.centerOfSearchArea, _this.searchTerm, _this.displayResults);
       };
     })(this);
     this.displayResults = (function(_this) {
       return function(results) {
-        console.log("results: " + results);
         _this.searchResults = results.slice(0, 10);
         return $scope.$apply();
       };
@@ -108,13 +117,17 @@
         mapTypeId: google.maps.MapTypeId.TERRAIN
       }
     };
-    this.mapCenterOptions = {
+    this.mapSearchAreaOptions = {
       draggable: true,
-      visible: false,
       icon: "https://maps.google.com/mapfiles/ms/icons/green-dot.png"
+    };
+    this.mapLocationOptions = {
+      draggable: true,
+      icon: "https://maps.google.com/mapfiles/ms/icons/blue-dot.png"
     };
     return this.searchResultOptions = {
       draggable: false,
+      clickable: true,
       icon: "https://maps.google.com/mapfiles/ms/icons/yellow-dot.png"
     };
   });

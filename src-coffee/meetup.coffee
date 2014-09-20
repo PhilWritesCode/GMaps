@@ -4,15 +4,15 @@ meetupApp.factory 'locationService', ->
 	@geocoder = new google.maps.Geocoder()
 	@searcher = new google.maps.places.PlacesService document.getElementById 'results'
 
-	@processLocation = (newLocation, addLocation) =>
-		@geocoder.geocode {address: newLocation}, (results, status) ->
+	@processLocation = (newLocation, startingLocation, addLocation) =>
+		@geocoder.geocode {address: newLocation, location: startingLocation}, (results, status) ->
 			if status == google.maps.GeocoderStatus.OK
 				addLocation results[0]
 			else
 				alert("Failed!  Status: " + status)
 
 	@performSearch = (searchArea, searchTerm, displayResults) =>
-		@searcher.textSearch {query : searchTerm, location : searchArea, radius: 5},(results, status) ->
+		@searcher.textSearch {query : searchTerm, location : searchArea, radius: 5},(results, status, pagination) ->
 			if status == google.maps.places.PlacesServiceStatus.ZERO_RESULTS
 				alert 'No results!'
 				return
@@ -25,8 +25,7 @@ meetupApp.controller 'MeetupController', ($scope,ngGPlacesAPI, locationService) 
 	@products = gems
 	@locations = []
 	@bounds = new google.maps.LatLngBounds()
-	@mapCenter
-	@mapCenterVisible = false
+	@centerOfSearchArea
 	@searchResults
 	@formEntry
 	@usedEntries = []
@@ -35,7 +34,7 @@ meetupApp.controller 'MeetupController', ($scope,ngGPlacesAPI, locationService) 
 
 	@processFormEntry = ->
 		if @formEntry && @formEntry not in @usedEntries
-			locationService.processLocation @formEntry, @addLocation
+			locationService.processLocation @formEntry, @centerOfSearchArea, @addLocation
 			@usedEntries.push @formEntry
 		@formEntry = ""
 
@@ -45,30 +44,46 @@ meetupApp.controller 'MeetupController', ($scope,ngGPlacesAPI, locationService) 
 		@performSearch()
 		$scope.$apply()
 
-	@updateMap = =>
-		@bounds = new google.maps.LatLngBounds()
-		for location in @locations
-			@bounds.extend location.geometry.location
-		@mapCenter = @bounds.getCenter()
-		@mapCenterOptions.visible = @locations.length > 1
+	@removeLocation = (locationToRemove) ->
+		@locations.pop locationToRemove
+		@usedEntries.pop locationToRemove
+		@updateMap()
+		@performSearch()
 
-	@updateCenter = (object, marker) ->
-		@mapCenter = marker.getPosition()
+	@updateMap = =>
+		if @locations.length > 0
+			@bounds = new google.maps.LatLngBounds()
+			for location in @locations
+				@bounds.extend location.geometry.location
+			@centerOfSearchArea = @bounds.getCenter()
+		else
+			@centerOfSearchArea = null
+
+	@updateSearchArea = (object, marker) ->
+		@centerOfSearchArea = marker.getPosition()
 		@performSearch()
 
 	@performSearch = =>
-		if !@searchTerm
+		if !@searchTerm || @locations.length == 0
+			@searchResults = []
 			return
-		locationService.performSearch @mapCenter, @searchTerm, @displayResults
+		locationService.performSearch @centerOfSearchArea, @searchTerm, @displayResults
 
 	@displayResults = (results) =>
-		console.log("results: " + results)
 		@searchResults = results.slice(0,10)
 		$scope.$apply()
 
+
 	@mapOptions = {map: {center: new google.maps.LatLng(39, -95),zoom: 4,mapTypeId: google.maps.MapTypeId.TERRAIN}};
-	@mapCenterOptions = {draggable: true, visible: false, icon:"https://maps.google.com/mapfiles/ms/icons/green-dot.png"}
-	@searchResultOptions = {draggable: false, icon:"https://maps.google.com/mapfiles/ms/icons/yellow-dot.png"}
+	@mapSearchAreaOptions = {draggable: true, icon:"https://maps.google.com/mapfiles/ms/icons/green-dot.png"}
+	@mapLocationOptions = {draggable: true, icon:"https://maps.google.com/mapfiles/ms/icons/blue-dot.png"}
+	@searchResultOptions = {draggable: false, clickable: true, icon:"https://maps.google.com/mapfiles/ms/icons/yellow-dot.png"}
+
+
+
+
+
+
 
 
 

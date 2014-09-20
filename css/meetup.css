@@ -1,4 +1,48 @@
+#map_canvas {
+	overflow: hidden;
+}
+
+.map img {
+  max-width: none;
+}
+
 .angular-google-map-container {
-    height: 400px;
-    width: 900px;
+    height: 500px;
+    width: 1000px;
+}
+
+.text-place, .text-place-no-filter-results {
+	margin: 4px 0 4px 30px;
+	padding: 15px;
+	font-size: 13px;
+	min-height: 90px;
+	position: relative;
+	overflow: hidden;
+	color: #666;
+}
+
+.text-place:hover, .text-place:focus {
+	box-shadow: 0 0 4px rgba(0,0,0,0.2);
+}
+
+.text-place-summary-details {
+	display: inline-block;
+	vertical-align: top;
+}
+
+.text-place-title {
+	font-size: 16px;
+	vertical-align: top;
+	display: inline-block;
+	color: #333;
+}
+
+.text-place-summary {
+	font-size: 13px;
+	margin-bottom: 3px;
+}
+
+.text-place-basic-details {
+	color: #999;
+	margin-bottom: 3px;
 }
