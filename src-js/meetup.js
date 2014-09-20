@@ -64,7 +64,7 @@
     this.addLocation = (function(_this) {
       return function(newLocation) {
         _this.locations.push(newLocation);
-        _this.updateMap();
+        _this.updateMapLocations();
         _this.performSearch();
         return $scope.$apply();
       };
@@ -72,10 +72,10 @@
     this.removeLocation = function(locationToRemove) {
       this.locations.pop(locationToRemove);
       this.usedEntries.pop(locationToRemove);
-      this.updateMap();
+      this.updateMapLocations();
       return this.performSearch();
     };
-    this.updateMap = (function(_this) {
+    this.updateMapLocations = (function(_this) {
       return function() {
         var location, _i, _len, _ref;
         if (_this.locations.length > 0) {
@@ -85,9 +85,27 @@
             location = _ref[_i];
             _this.bounds.extend(location.geometry.location);
           }
-          return _this.centerOfSearchArea = _this.bounds.getCenter();
-        } else {
-          return _this.centerOfSearchArea = null;
+        }
+        return _this.centerOfSearchArea = _this.bounds.getCenter();
+      };
+    })(this);
+    this.updateMapSearchResults = (function(_this) {
+      return function() {
+        var location, result, _i, _j, _len, _len1, _ref, _ref1, _results;
+        if (_this.searchResults.length > 0) {
+          _this.bounds = new google.maps.LatLngBounds();
+          _ref = _this.locations;
+          for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+            location = _ref[_i];
+            _this.bounds.extend(location.geometry.location);
+          }
+          _ref1 = _this.searchResults;
+          _results = [];
+          for (_j = 0, _len1 = _ref1.length; _j < _len1; _j++) {
+            result = _ref1[_j];
+            _results.push(_this.bounds.extend(result.geometry.location));
+          }
+          return _results;
         }
       };
     })(this);
@@ -107,9 +125,34 @@
     this.displayResults = (function(_this) {
       return function(results) {
         _this.searchResults = results.slice(0, 10);
+        _this.updateMapSearchResults();
         return $scope.$apply();
       };
     })(this);
+    this.getMapSearchAreaOptions = function() {
+      if (this.locations.length > 0) {
+        return this.mapSearchAreaOptions;
+      } else {
+        return this.mapHiddenMarkersOptions;
+      }
+    };
+    this.getMapSearchResultsOptions = function(result) {
+      return angular.extend(this.searchResultOptions, result.selected ? this.markerSelectedIcon : this.markerNotSelectedIcon);
+    };
+    this.selectResult = function(result) {
+      result.selected = true;
+      return $scope.$broadcast('gmMarkersUpdate', 'meetup.searchResults');
+    };
+    this.deSelectResult = function(result) {
+      result.selected = false;
+      return $scope.$broadcast('gmMarkersUpdate', 'meetup.searchResults');
+    };
+    this.markerSelectedIcon = {
+      icon: 'https://maps.gstatic.com/mapfiles/ms2/micons/yellow-dot.png'
+    };
+    this.markerNotSelectedIcon = {
+      icon: 'https://maps.gstatic.com/mapfiles/ms2/micons/red-dot.png'
+    };
     this.mapOptions = {
       map: {
         center: new google.maps.LatLng(39, -95),
@@ -118,17 +161,20 @@
       }
     };
     this.mapSearchAreaOptions = {
+      visible: true,
       draggable: true,
       icon: "https://maps.google.com/mapfiles/ms/icons/green-dot.png"
     };
     this.mapLocationOptions = {
-      draggable: true,
+      draggable: false,
       icon: "https://maps.google.com/mapfiles/ms/icons/blue-dot.png"
     };
-    return this.searchResultOptions = {
+    this.searchResultOptions = {
       draggable: false,
-      clickable: true,
-      icon: "https://maps.google.com/mapfiles/ms/icons/yellow-dot.png"
+      clickable: true
+    };
+    return this.mapHiddenMarkersOptions = {
+      visible: false
     };
   });
 

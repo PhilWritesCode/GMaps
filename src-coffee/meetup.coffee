@@ -40,24 +40,30 @@ meetupApp.controller 'MeetupController', ($scope,ngGPlacesAPI, locationService) 
 
 	@addLocation = (newLocation) =>
 		@locations.push newLocation
-		@updateMap()
+		@updateMapLocations()
 		@performSearch()
 		$scope.$apply()
 
 	@removeLocation = (locationToRemove) ->
 		@locations.pop locationToRemove
 		@usedEntries.pop locationToRemove
-		@updateMap()
+		@updateMapLocations()
 		@performSearch()
 
-	@updateMap = =>
+	@updateMapLocations = =>
 		if @locations.length > 0
 			@bounds = new google.maps.LatLngBounds()
 			for location in @locations
 				@bounds.extend location.geometry.location
-			@centerOfSearchArea = @bounds.getCenter()
-		else
-			@centerOfSearchArea = null
+		@centerOfSearchArea = @bounds.getCenter()
+
+	@updateMapSearchResults = =>
+		if@searchResults.length > 0
+			@bounds = new google.maps.LatLngBounds()
+			for location in @locations
+				@bounds.extend location.geometry.location
+			for result in @searchResults
+				@bounds.extend result.geometry.location
 
 	@updateSearchArea = (object, marker) ->
 		@centerOfSearchArea = marker.getPosition()
@@ -71,13 +77,40 @@ meetupApp.controller 'MeetupController', ($scope,ngGPlacesAPI, locationService) 
 
 	@displayResults = (results) =>
 		@searchResults = results.slice(0,10)
+		@updateMapSearchResults()
 		$scope.$apply()
 
+	@getMapSearchAreaOptions = ->
+		if @locations.length > 0
+			return @mapSearchAreaOptions
+		else
+			return @mapHiddenMarkersOptions
+
+	@getMapSearchResultsOptions = (result) ->
+		angular.extend( @searchResultOptions,
+			if result.selected
+				@markerSelectedIcon
+			else
+				@markerNotSelectedIcon
+		)
+
+	@selectResult = (result) ->
+		result.selected = true
+		$scope.$broadcast('gmMarkersUpdate', 'meetup.searchResults');
+
+
+	@deSelectResult = (result) ->
+		result.selected = false
+		$scope.$broadcast('gmMarkersUpdate', 'meetup.searchResults');
+
+	@markerSelectedIcon = {icon: 'https://maps.gstatic.com/mapfiles/ms2/micons/yellow-dot.png'}
+	@markerNotSelectedIcon = {icon: 'https://maps.gstatic.com/mapfiles/ms2/micons/red-dot.png'}
 
 	@mapOptions = {map: {center: new google.maps.LatLng(39, -95),zoom: 4,mapTypeId: google.maps.MapTypeId.TERRAIN}};
-	@mapSearchAreaOptions = {draggable: true, icon:"https://maps.google.com/mapfiles/ms/icons/green-dot.png"}
-	@mapLocationOptions = {draggable: true, icon:"https://maps.google.com/mapfiles/ms/icons/blue-dot.png"}
-	@searchResultOptions = {draggable: false, clickable: true, icon:"https://maps.google.com/mapfiles/ms/icons/yellow-dot.png"}
+	@mapSearchAreaOptions = {visible: true; draggable: true, icon:"https://maps.google.com/mapfiles/ms/icons/green-dot.png"}
+	@mapLocationOptions = {draggable: false, icon:"https://maps.google.com/mapfiles/ms/icons/blue-dot.png"}
+	@searchResultOptions = {draggable: false, clickable: true}
+	@mapHiddenMarkersOptions = {visible: false}
 
 
 

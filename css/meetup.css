@@ -2,6 +2,12 @@
 	overflow: hidden;
 }
 
+#resultList {
+	height: 500px;
+	overflow-x: hidden;
+	overflow-y: auto;
+}
+
 .map img {
   max-width: none;
 }
@@ -15,7 +21,6 @@
 	margin: 4px 0 4px 30px;
 	padding: 15px;
 	font-size: 13px;
-	min-height: 90px;
 	position: relative;
 	overflow: hidden;
 	color: #666;
@@ -44,5 +49,4 @@
 
 .text-place-basic-details {
 	color: #999;
-	margin-bottom: 3px;
 }

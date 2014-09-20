@@ -15,13 +15,31 @@
             <div class="row-fluid">
                 <div class="span3">
                     <form name="locationEntryForm" ng-submit="meetup.processFormEntry()" class="form-search">
-                        <label class="control-label" style="padding-right: 5px">Where are you?</label>
+                        <label class="control-label" style="padding-right: 5px">Where is everyone?</label>
                         <div class="input-append">
-                            <input type="text" id="locationInput" autofocus="true" class="input-medium search-query" placeholder="Enter an address" title="Location" ng-model="meetup.formEntry" />
+                            <input type="text" id="locationInput" autofocus="true" class="input-medium search-query" placeholder="Enter an address" title="Enter addresses here!" ng-model="meetup.formEntry" />
                             <input type="submit" class="btn btn-primary" value="Add" />
                         </div>
-
                     </form>
+                </div>
+                <div class="span6">
+                    <form name="searchForm" ng-submit="meetup.performSearch()" class="form-search">
+                        <label class="control-label" style="padding-right: 5px">What do you want to do?</label>
+                        <div class="input-append">
+                            <input type="text" id="searchInput" class="input-large search-query" placeholder="Enter a meetup spot!  For example: 'coffee'" title="Enter a meetup spot!  For example: 'coffee'" ng-model="meetup.searchTerm" />
+                            <input type="submit" class="btn btn-primary" value="Search!" />
+                        </div>
+                    </form>
+                </div>
+                <div class="span3">
+                    <div id="results"></div>
+                    <div ng-show="meetup.searchResults.length > 0">
+                        <h3>Results</h3>
+                    </div>
+                </div>
+            </div>
+            <div class="row-fluid">
+                <div class="span3">
                     <ul class="unstyled">
                         <li ng-repeat="location in meetup.locations">
                             <i class="icon-remove-circle" title="click to remove location" ng-click="meetup.removeLocation(location)"></i>  {{location.formatted_address}}
@@ -29,14 +47,6 @@
                     </ul>
                 </div>
                 <div class="span6">
-
-                    <form name="searchForm" ng-submit="meetup.performSearch()" class="form-search">
-                        <label class="control-label" style="padding-right: 5px">What do you want to do?</label>
-                        <div class="input-append">
-                            <input type="text" id="searchInput" class="input-large search-query" placeholder="Enter a meetup spot!  For example: 'coffee'" title="Location" ng-model="meetup.searchTerm" />
-                            <input type="submit" class="btn btn-primary" value="Search!" />
-                        </div>
-                    </form>
                     <div id="map_canvas">
                         <div gm-info-window="infoWindow">
                             <h4>{{selectedLocation.name}}</h4>
@@ -51,24 +61,25 @@
                             <gm-markers gm-objects="meetup.centerOfSearchArea"
                                         gm-id="searchAreaMarker"
                                         gm-position="{lat: meetup.centerOfSearchArea.lat(), lng: meetup.centerOfSearchArea.lng()}"
-                                        gm-marker-options="meetup.mapSearchAreaOptions"
+                                        gm-marker-options="meetup.getMapSearchAreaOptions()"
                                         gm-on-dragend="meetup.updateSearchArea(object, marker)">
                             </gm-markers>
                             <gm-markers gm-objects="meetup.searchResults"
                                         gm-id="object.formatted_address"
                                         gm-position="{lat: object.geometry.location.lat(), lng: object.geometry.location.lng()}"
-                                        gm-marker-options="meetup.searchResultOptions">
+                                        gm-marker-options="meetup.getMapSearchResultsOptions(object)">
                             </gm-markers>
                         </gm-map>
                     </div>
                 </div>
                 <div class="span3">
-                    <div id="results"></div>
-                    <div ng-repeat="result in meetup.searchResults" class="text-place">
-                        <div class="text-place-summary-details">
-                            <h3 class="text-place-title">{{result.name}}</h3>
-                            <div class="text-place-basic-details" jstcache="0">
-                                <span class="text-place-address">{{result.formatted_address.substr(0,result.formatted_address.indexOf(', United States')) }}</span>
+                    <div id="resultList" ng-show="meetup.searchResults">
+                        <div ng-repeat="result in meetup.searchResults" class="text-place">
+                            <div class="text-place-summary-details" ng-mouseover="meetup.selectResult(result)" ng-mouseout="meetup.deSelectResult(result)">
+                                <span class="text-place-title">{{result.name}}</span>
+                                <div class="text-place-basic-details" jstcache="0">
+                                    <span class="text-place-address">{{result.formatted_address.substr(0,result.formatted_address.indexOf(', United States')) }}</span>
+                                </div>
                             </div>
                         </div>
                     </div>
