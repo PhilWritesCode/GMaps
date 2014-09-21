@@ -48,13 +48,13 @@
                 </div>
                 <div class="span6">
                     <div id="map_canvas">
-                        <div gm-info-window="infoWindow">
+                        <div gm-info-window="infoWindow" gm-on-closeclick="meetup.deSelectResult(selectedLocation)">
                             <h4>{{selectedLocation.name}}</h4>
                             {{selectedLocation.formatted_address}}
                         </div>
                         <gm-map gm-map-id="'simpleMap'" gm-bounds="meetup.bounds" gm-map-options="meetup.mapOptions.map" class="angular-google-map-container">
                             <gm-markers gm-objects="meetup.locations"
-                                        gm-id="object.formatted_address"
+                                        gm-id="'location' + object.formatted_address"
                                         gm-position="{lat: object.geometry.location.lat(), lng: object.geometry.location.lng()}"
                                         gm-marker-options="meetup.mapLocationOptions">
                             </gm-markers>
@@ -65,9 +65,15 @@
                                         gm-on-dragend="meetup.updateSearchArea(object, marker)">
                             </gm-markers>
                             <gm-markers gm-objects="meetup.searchResults"
-                                        gm-id="object.formatted_address"
+                                        gm-id="'result' + object.formatted_address"
                                         gm-position="{lat: object.geometry.location.lat(), lng: object.geometry.location.lng()}"
-                                        gm-marker-options="meetup.getMapSearchResultsOptions(object)">
+                                        gm-marker-options="meetup.getMapSearchResultsOptions(object)"
+                                        gm-events="meetup.markerEvents"
+                                        gm-on-openinfowindow="selectedLocation = object; infoWindow.open(marker.getMap(), marker)"
+                                        gm-on-closeinfowindow="selectedLocation = null; infoWindow.close()"
+                                        gm-on-click="meetup.toggleSelection(object)"
+                                        gm-on-mouseover="meetup.highlightResult(object)"
+                                        gm-on-mouseout="meetup.unHighlightResult(object)">
                             </gm-markers>
                         </gm-map>
                     </div>
@@ -75,7 +81,7 @@
                 <div class="span3">
                     <div id="resultList" ng-show="meetup.searchResults">
                         <div ng-repeat="result in meetup.searchResults" class="text-place">
-                            <div class="text-place-summary-details" ng-mouseover="meetup.selectResult(result)" ng-mouseout="meetup.deSelectResult(result)">
+                            <div class="text-place-summary-details" ng-mouseover="meetup.highlightResult(result)" ng-mouseout="meetup.unHighlightResult(result)" ng-click="meetup.toggleSelection(result)">
                                 <span class="text-place-title">{{result.name}}</span>
                                 <div class="text-place-basic-details" jstcache="0">
                                     <span class="text-place-address">{{result.formatted_address.substr(0,result.formatted_address.indexOf(', United States')) }}</span>
@@ -86,89 +92,6 @@
                 </div>
             </div>
         </div>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-   <!-- <br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/>
-    <h1>STORE STUFF</h1>
-    <br/><br/>
-
-        <div class="row" ng-repeat="product in meetup.products">
-            <h3>
-                {{product.name}}
-                <em class="pull-right">{{product.price | currency}}</em>
-            </h3>
-            <section ng-init="tab = 1" ng-controller="PanelController as panel">
-                <ul class="nav nav-pills">
-                    <li ng-class="{active:panel.isSelected(1)}">
-                        <a href ng-click="panel.selectTab(1)">Description</a>
-                    </li>
-                    <li ng-class="{active:panel.isSelected(2)}">
-                        <a href ng-click="panel.selectTab(2)">Specifications</a>
-                    </li>
-                    <li ng-class="{active:panel.isSelected(3)}">
-                        <a href ng-click="panel.selectTab(3)">Reviews</a>
-                    </li>
-                </ul>
-                <div class="panel" ng-show="panel.isSelected(1)">
-                    <h4>Description</h4>
-                    <p>{{product.description}}</p>
-                </div>
-                <div class="panel" ng-show="panel.isSelected(2)">
-                    <h4>Specifications</h4>
-                    <p>Nada </p>
-                </div>
-                <div class="panel" ng-show="panel.isSelected(3)">
-                    <h4>Reviews</h4>
-                    <blockquote ng-repeat="review in product.reviews">
-                        <b>Stars: {{review.stars}}</b>
-                        {{review.body}}
-                        <cite class="clearfix">by: {{review.author}}</cite>
-                    </blockquote>
-                    <form name="reviewForm" ng-controller="ReviewController as reviewCtrl"
-                            ng-submit="reviewCtrl.addReview(product)">
-
-                        <blockquote>
-                            <strong>{{reviewCtrl.review.stars}} Stars</strong>
-                            {{reviewCtrl.review.body}}
-                            <cite class="clearfix">by: {{reviewCtrl.review.author}}</cite>
-                        </blockquote>
-
-                        <h4>Submit a Review</h4>
-                        <fieldset class="form-group">
-                            <select class="form-control" ng-options="stars for stars in [5,4,3,2,1]"  title="Stars" ng-model="reviewCtrl.review.stars">
-                                <option value="">Rate the Product</option>
-                            </select>
-                        </fieldset>
-                        <fieldset class="form-group">
-                            <textarea class="form-control" placeholder="Write a short review of the product..." title="Review" ng-model="reviewCtrl.review.body"></textarea>
-                        </fieldset>
-                        <fieldset class="form-group">
-                            <input type="email" class="form-control" placeholder="jimmyDean@example.org" title="Email" ng-model="reviewCtrl.review.author" />
-                        </fieldset>
-                        <fieldset class="form-group">
-                            <input type="submit" class="btn btn-primary pull-right" value="Submit Review" />
-                        </fieldset>
-                    </form>
-                </div>
-            </section>
-
-        </div>
-    -->
 
 		<script type="text/javascript" src="lib/angular.min.js"></script>
 		<script type="text/javascript" src="src-js/meetup.js"></script>

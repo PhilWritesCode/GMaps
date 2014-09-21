@@ -22,7 +22,6 @@ meetupApp.factory 'locationService', ->
 
 
 meetupApp.controller 'MeetupController', ($scope,ngGPlacesAPI, locationService) ->
-	@products = gems
 	@locations = []
 	@bounds = new google.maps.LatLngBounds()
 	@centerOfSearchArea
@@ -31,6 +30,7 @@ meetupApp.controller 'MeetupController', ($scope,ngGPlacesAPI, locationService) 
 	@usedEntries = []
 	@searchTerm = "coffee"
 	@searchResults
+	@markerEvents
 
 	@processFormEntry = ->
 		if @formEntry && @formEntry not in @usedEntries
@@ -90,54 +90,52 @@ meetupApp.controller 'MeetupController', ($scope,ngGPlacesAPI, locationService) 
 		angular.extend( @searchResultOptions,
 			if result.selected
 				@markerSelectedIcon
+			else if result.highlighted
+				@markerHighlightedIcon
 			else
-				@markerNotSelectedIcon
+				@markerDefaultIcon
 		)
 
-	@selectResult = (result) ->
-		result.selected = true
+	@selectResult = (thisResult) ->
+		for result in @searchResults
+			result.selected = false
+		thisResult.selected = true
+		$scope.$broadcast('gmMarkersUpdate', 'meetup.searchResults');
+
+	@deSelectResult = (thisResult) ->
+		thisResult.selected = false
 		$scope.$broadcast('gmMarkersUpdate', 'meetup.searchResults');
 
 
-	@deSelectResult = (result) ->
-		result.selected = false
-		$scope.$broadcast('gmMarkersUpdate', 'meetup.searchResults');
+	@highlightResult = (result) ->
+    		result.highlighted = true
+    		$scope.$broadcast('gmMarkersUpdate', 'meetup.searchResults');
+
+	@unHighlightResult = (result) ->
+    		result.highlighted = false
+    		$scope.$broadcast('gmMarkersUpdate', 'meetup.searchResults');
+
+	@toggleSelection = (result) ->
+		if result.selected
+			@deSelectResult result
+			@triggerCloseInfoWindow result
+		else
+			@selectResult result
+			@triggerOpenInfoWindow result
+
+	@triggerOpenInfoWindow = (result) ->
+    		@markerEvents = [{event: 'openinfowindow',ids: ['result' + result.formatted_address]}];
+
+	@triggerCloseInfoWindow = (result) ->
+    		@markerEvents = [{event: 'closeinfowindow',ids: ['result' + result.formatted_address]}];
+
 
 	@markerSelectedIcon = {icon: 'https://maps.gstatic.com/mapfiles/ms2/micons/yellow-dot.png'}
-	@markerNotSelectedIcon = {icon: 'https://maps.gstatic.com/mapfiles/ms2/micons/red-dot.png'}
+	@markerHighlightedIcon = {icon: 'http://labs.google.com/ridefinder/images/mm_20_yellow.png'}
+	@markerDefaultIcon = {icon: 'http://labs.google.com/ridefinder/images/mm_20_purple.png'}
 
 	@mapOptions = {map: {center: new google.maps.LatLng(39, -95),zoom: 4,mapTypeId: google.maps.MapTypeId.TERRAIN}};
-	@mapSearchAreaOptions = {visible: true; draggable: true, icon:"https://maps.google.com/mapfiles/ms/icons/green-dot.png"}
+	@mapSearchAreaOptions = {visible: true; draggable: true, icon:"http://maps.google.com/intl/en_us/mapfiles/ms/micons/green-dot.png"}
 	@mapLocationOptions = {draggable: false, icon:"https://maps.google.com/mapfiles/ms/icons/blue-dot.png"}
 	@searchResultOptions = {draggable: false, clickable: true}
 	@mapHiddenMarkersOptions = {visible: false}
-
-
-
-
-
-
-
-
-
-
-
-
-gems = [
-	{name: 'Dodecahedron', price: 2.95, description: 'Here is some nonsensical description text', reviews:[], canPurchase: true, soldOut: true},
-	{name: 'Pentagonal Gem', price: 5.95, description: 'Different descriptive text', reviews:[], canPurchase: true, soldOut: false},
-	{name: 'Something new', price: 4.95, description: 'Poo dollar',reviews: [{stars:5, body:"I love this product!", author: "phil@shutterfly.com"}], canPurchase: true, soldOut: false},
-]
-
-meetupApp.controller 'PanelController', ->
-	@tab = 1
-	@selectTab = (setTab) ->
-		@tab = setTab
-	@isSelected = (checkTab) ->
-		@tab == checkTab
-
-meetupApp.controller 'ReviewController', ->
-	@review = {}
-	@addReview = (address) ->
-		address.reviews.push(@review)
-		@review = {}

@@ -8,6 +8,10 @@
 	overflow-y: auto;
 }
 
+.map {
+  height: 300px;
+}
+
 .map img {
   max-width: none;
 }
@@ -15,6 +19,10 @@
 .angular-google-map-container {
     height: 500px;
     width: 1000px;
+}
+
+.angular-google-map-container img {
+	max-width: none;
 }
 
 .text-place, .text-place-no-filter-results {
