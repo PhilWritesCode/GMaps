@@ -37,9 +37,23 @@
         });
       };
     })(this);
+    this.getLocationDetails = (function(_this) {
+      return function(locationReferenceId, addLocationDetails) {
+        return _this.searcher.getDetails({
+          placeId: locationReferenceId
+        }, function(place, status) {
+          if (status !== google.maps.places.PlacesServiceStatus.OK) {
+            alert('Detail error!');
+            return;
+          }
+          return addLocationDetails(place);
+        });
+      };
+    })(this);
     return {
       processLocation: this.processLocation,
-      performSearch: this.performSearch
+      performSearch: this.performSearch,
+      getLocationDetails: this.getLocationDetails
     };
   });
 
@@ -47,7 +61,6 @@
     this.locations = [];
     this.bounds = new google.maps.LatLngBounds();
     this.centerOfSearchArea;
-    this.searchResults;
     this.formEntry;
     this.usedEntries = [];
     this.searchTerm = "coffee";
@@ -129,6 +142,22 @@
         return $scope.$apply();
       };
     })(this);
+    this.addLocationDetail = (function(_this) {
+      return function(place) {
+        var result, _i, _len, _ref, _results;
+        _ref = _this.searchResults;
+        _results = [];
+        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+          result = _ref[_i];
+          if (result.place_id === place.place_id) {
+            _results.push(result.photos = place.photos);
+          } else {
+            _results.push(void 0);
+          }
+        }
+        return _results;
+      };
+    })(this);
     this.getMapSearchAreaOptions = function() {
       if (this.locations.length > 0) {
         return this.mapSearchAreaOptions;
@@ -205,7 +234,7 @@
     this.mapSearchAreaOptions = {
       visible: true,
       draggable: true,
-      icon: "http://maps.google.com/intl/en_us/mapfiles/ms/micons/green-dot.png"
+      icon: "http://maps.google.com/mapfiles/arrow.png"
     };
     this.mapLocationOptions = {
       draggable: false,

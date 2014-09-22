@@ -38,7 +38,7 @@
                     </div>
                 </div>
             </div>
-            <div class="row-fluid">
+            <div class="row-fluid" >
                 <div class="span3">
                     <ul class="unstyled">
                         <li ng-repeat="location in meetup.locations">
@@ -80,13 +80,15 @@
                 </div>
                 <div class="span3">
                     <div id="resultList" ng-show="meetup.searchResults">
-                        <div ng-repeat="result in meetup.searchResults" class="text-place">
-                            <div class="text-place-summary-details" ng-mouseover="meetup.highlightResult(result)" ng-mouseout="meetup.unHighlightResult(result)" ng-click="meetup.toggleSelection(result)">
+                        <div ng-repeat="result in meetup.searchResults" class="text-place" ng-mouseover="meetup.highlightResult(result)" ng-mouseout="meetup.unHighlightResult(result)" ng-click="meetup.toggleSelection(result)">
+                            <div class="text-place-summary-details" >
                                 <span class="text-place-title">{{result.name}}</span>
                                 <div class="text-place-basic-details" jstcache="0">
                                     <span class="text-place-address">{{result.formatted_address.substr(0,result.formatted_address.indexOf(', United States')) }}</span>
                                 </div>
                             </div>
+                            <img ng-show="result.photos[0]" ng-src="{{result.photos[0].getUrl({'maxWidth': 90, 'maxHeight': 90})}}" class="text-place-thumbnail"/>
+
                         </div>
                     </div>
                 </div>

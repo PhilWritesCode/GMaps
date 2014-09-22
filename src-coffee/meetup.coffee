@@ -18,14 +18,20 @@ meetupApp.factory 'locationService', ->
 				return
 			displayResults results
 
-	{@processLocation, @performSearch}
+	@getLocationDetails = (locationReferenceId, addLocationDetails) =>
+		@searcher.getDetails {placeId : locationReferenceId},(place, status) ->
+			if status != google.maps.places.PlacesServiceStatus.OK
+				alert 'Detail error!'
+				return
+			addLocationDetails place
+
+	{@processLocation, @performSearch, @getLocationDetails}
 
 
 meetupApp.controller 'MeetupController', ($scope,ngGPlacesAPI, locationService) ->
 	@locations = []
 	@bounds = new google.maps.LatLngBounds()
 	@centerOfSearchArea
-	@searchResults
 	@formEntry
 	@usedEntries = []
 	@searchTerm = "coffee"
@@ -79,6 +85,12 @@ meetupApp.controller 'MeetupController', ($scope,ngGPlacesAPI, locationService) 
 		@searchResults = results.slice(0,10)
 		@updateMapSearchResults()
 		$scope.$apply()
+
+	@addLocationDetail = (place) =>
+		for result in @searchResults
+			if result.place_id == place.place_id
+				result.photos = place.photos
+
 
 	@getMapSearchAreaOptions = ->
 		if @locations.length > 0
@@ -135,7 +147,7 @@ meetupApp.controller 'MeetupController', ($scope,ngGPlacesAPI, locationService) 
 	@markerDefaultIcon = {icon: 'http://labs.google.com/ridefinder/images/mm_20_purple.png'}
 
 	@mapOptions = {map: {center: new google.maps.LatLng(39, -95),zoom: 4,mapTypeId: google.maps.MapTypeId.TERRAIN}};
-	@mapSearchAreaOptions = {visible: true; draggable: true, icon:"http://maps.google.com/intl/en_us/mapfiles/ms/micons/green-dot.png"}
+	@mapSearchAreaOptions = {visible: true; draggable: true, icon:"http://maps.google.com/mapfiles/arrow.png"}
 	@mapLocationOptions = {draggable: false, icon:"https://maps.google.com/mapfiles/ms/icons/blue-dot.png"}
 	@searchResultOptions = {draggable: false, clickable: true}
 	@mapHiddenMarkersOptions = {visible: false}
