@@ -48,9 +48,18 @@
                 </div>
                 <div class="span6">
                     <div id="map_canvas">
-                        <div gm-info-window="infoWindow" gm-on-closeclick="meetup.deSelectResult(selectedLocation)">
-                            <h4>{{selectedLocation.name}}</h4>
-                            {{selectedLocation.formatted_address}}
+                        <div gm-info-window="infoWindow" class="infoWindow well"
+                             gm-on-closeclick="meetup.deSelectResult(selectedLocation)">
+                            <h4><a target="_blank" href="{{selectedLocation.url}}">{{selectedLocation.name}}</a></h4>
+                            <div class="text-place-summary-details" >
+                                <div class="text-place-basic-details" >
+                                    <div class="text-place-address">{{selectedLocation.formatted_address.substr(0,result.formatted_address.indexOf(', United States')) }}</div>
+                                    <div class="text-place-phone">{{selectedLocation.formatted_phone_number}}</div>
+                                </div>
+                                <div class="text-place-basic-details" ng-show="selectedLocation.website">
+                                    <span class="text-place-website"><a target="_blank" href="{{selectedLocation.website}}">{{meetup.getBaseUrl(selectedLocation.website)}}</a></span>
+                                </div>
+                            </div>
                         </div>
                         <gm-map gm-map-id="'simpleMap'" gm-bounds="meetup.bounds" gm-map-options="meetup.mapOptions.map" class="angular-google-map-container">
                             <gm-markers gm-objects="meetup.locations"
@@ -85,7 +94,7 @@
                                 <span class="text-place-title">{{result.name}}</span>
                                 <div class="text-place-summary">
                                     <span ng-show="result.rating">
-                                        <span class="text-place-score">{{result.rating}}</span>
+                                        <span class="text-place-score">{{ result.rating | number:1 }}</span>
                                         <span cass="text-place-stars">
                                             <span class="text-place-star" ng-show="result.rating >= .8"></span>
                                             <span class="text-place-star" ng-show="result.rating >= 1.8"></span>
@@ -102,12 +111,25 @@
                                             <span class="text-place-star text-place-star-empty" ng-show="result.rating < 2.3"></span>
                                             <span class="text-place-star text-place-star-empty" ng-show="result.rating < 1.3"></span>
                                             <span class="text-place-star text-place-star-empty" ng-show="result.rating < 0.3"></span>
-
                                         </span>
                                     </span>
                                 </div>
                                 <div class="text-place-basic-details" jstcache="0">
                                     <span class="text-place-address">{{result.formatted_address.substr(0,result.formatted_address.indexOf(', United States')) }}</span>
+                                </div>
+                                <div ng-show="result.selected">
+                                    <div class="text-place-basic-details" ng-show="selectedLocation.website">
+                                        <span class="text-place-website"><a target="_blank" href="{{selectedLocation.website}}">{{meetup.getBaseUrl(selectedLocation.website)}}</a></span>
+                                    </div>
+                                    <div class="text-place-hours">
+                                        <span>Open today:</span>
+                                        <div class="text-place-open-hours">
+                                            {{meetup.getHoursForToday(result)}}
+                                        </div>
+                                    </div>
+                                    <div ng-show="result.reviews">
+                                        <a target="_blank" class="text-place-reviews" href="{{result.url}}">Read all {{result.reviews.length}} reviews</a>
+                                    </div>
                                 </div>
                             </div>
                             <img ng-show="result.photos[0]" ng-src="{{result.photos[0].getUrl({'maxWidth': 90, 'maxHeight': 90})}}" class="text-place-thumbnail"/>

@@ -144,18 +144,21 @@
     })(this);
     this.addLocationDetail = (function(_this) {
       return function(place) {
-        var result, _i, _len, _ref, _results;
+        var result, _i, _len, _ref;
         _ref = _this.searchResults;
-        _results = [];
         for (_i = 0, _len = _ref.length; _i < _len; _i++) {
           result = _ref[_i];
           if (result.place_id === place.place_id) {
-            _results.push(result.photos = place.photos);
-          } else {
-            _results.push(void 0);
+            result.reviews = place.reviews;
+            result.formatted_phone_number = place.formatted_phone_number;
+            result.url = place.url;
+            result.website = place.website;
+            result.opening_hours = place.opening_hours;
+            break;
           }
         }
-        return _results;
+        $scope.$apply();
+        return $scope.$broadcast('gmMarkersUpdate', 'meetup.searchResults');
       };
     })(this);
     this.getMapSearchAreaOptions = function() {
@@ -168,8 +171,52 @@
     this.getMapSearchResultsOptions = function(result) {
       return angular.extend(this.searchResultOptions, result.selected ? this.markerSelectedIcon : result.highlighted ? this.markerHighlightedIcon : this.markerDefaultIcon);
     };
+    this.getBaseUrl = function(fullUrl) {
+      var urlParts;
+      if (fullUrl) {
+        urlParts = fullUrl.split('/');
+        return urlParts[2];
+      }
+    };
+    this.getHoursForToday = function(result) {
+      var close, currentPeriod, dayIndex, open;
+      dayIndex = new Date().getDay();
+      if (result.opening_hours && result.opening_hours.periods) {
+        console.log('here2');
+        currentPeriod = result.opening_hours.periods[dayIndex];
+        console.log(currentPeriod);
+        open = this.formatHours(currentPeriod.open.hours) + ':' + this.formatMinutes(currentPeriod.open.minutes) + " " + this.getAMPM(currentPeriod.open.hours);
+        close = this.formatHours(currentPeriod.close.hours) + ':' + this.formatMinutes(currentPeriod.close.minutes) + " " + this.getAMPM(currentPeriod.close.hours);
+        return open + " - " + close;
+      }
+    };
+    this.formatHours = function(rawHours) {
+      if (rawHours < 13) {
+        return rawHours;
+      } else {
+        return rawHours - 12;
+      }
+    };
+    this.formatMinutes = function(rawMinutes) {
+      console.log('raw minutes: ' + rawMinutes + ' length:' + rawMinutes.length);
+      if (rawMinutes > 10) {
+        return rawMinutes;
+      } else {
+        return rawMinutes + "0";
+      }
+    };
+    this.getAMPM = function(rawHours) {
+      if (rawHours < 12) {
+        return "am";
+      } else {
+        return "pm";
+      }
+    };
     this.selectResult = function(thisResult) {
       var result, _i, _len, _ref;
+      if (thisResult.website === void 0) {
+        locationService.getLocationDetails(thisResult.place_id, this.addLocationDetail);
+      }
       _ref = this.searchResults;
       for (_i = 0, _len = _ref.length; _i < _len; _i++) {
         result = _ref[_i];

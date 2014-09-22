@@ -89,8 +89,14 @@ meetupApp.controller 'MeetupController', ($scope,ngGPlacesAPI, locationService) 
 	@addLocationDetail = (place) =>
 		for result in @searchResults
 			if result.place_id == place.place_id
-				result.photos = place.photos
-
+				result.reviews = place.reviews
+				result.formatted_phone_number = place.formatted_phone_number
+				result.url = place.url
+				result.website = place.website
+				result.opening_hours = place.opening_hours
+				break;
+		$scope.$apply()
+		$scope.$broadcast('gmMarkersUpdate', 'meetup.searchResults');
 
 	@getMapSearchAreaOptions = ->
 		if @locations.length > 0
@@ -108,7 +114,43 @@ meetupApp.controller 'MeetupController', ($scope,ngGPlacesAPI, locationService) 
 				@markerDefaultIcon
 		)
 
+	@getBaseUrl = (fullUrl) ->
+		if(fullUrl)
+			urlParts = fullUrl.split '/'
+			urlParts[2]
+
+	@getHoursForToday = (result) ->
+		dayIndex = new Date().getDay()
+		if result.opening_hours && result.opening_hours.periods
+			console.log 'here2'
+			currentPeriod = result.opening_hours.periods[dayIndex]
+			console.log currentPeriod
+			open = @formatHours(currentPeriod.open.hours) + ':' + @formatMinutes(currentPeriod.open.minutes) + " " + @getAMPM(currentPeriod.open.hours)
+			close = @formatHours(currentPeriod.close.hours) + ':' + @formatMinutes(currentPeriod.close.minutes) + " " + @getAMPM(currentPeriod.close.hours)
+			return open + " - " + close
+
+	@formatHours = (rawHours) ->
+		if rawHours < 13
+			return rawHours
+		else
+			return rawHours - 12
+
+	@formatMinutes = (rawMinutes) ->
+		console.log('raw minutes: ' + rawMinutes + ' length:' + rawMinutes.length)
+		if rawMinutes > 10
+			return rawMinutes
+		else
+			return rawMinutes + "0"
+
+	@getAMPM = (rawHours) ->
+		if rawHours < 12
+			return "am"
+		else
+			return "pm"
+
 	@selectResult = (thisResult) ->
+		if(thisResult.website == undefined)
+			locationService.getLocationDetails thisResult.place_id, @addLocationDetail
 		for result in @searchResults
 			result.selected = false
 		thisResult.selected = true
@@ -117,7 +159,6 @@ meetupApp.controller 'MeetupController', ($scope,ngGPlacesAPI, locationService) 
 	@deSelectResult = (thisResult) ->
 		thisResult.selected = false
 		$scope.$broadcast('gmMarkersUpdate', 'meetup.searchResults');
-
 
 	@highlightResult = (result) ->
     		result.highlighted = true
