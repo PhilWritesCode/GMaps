@@ -47,6 +47,32 @@
 	margin-bottom: 3px;
 }
 
+.text-place-score {
+	color: #e7711b;
+	margin-right: 5px;
+}
+
+.text-place-stars {
+	display: inline-block;
+	margin-right: 6px;
+}
+
+.text-place-star {
+	display: inline-block;
+	background-image: url('http://maps.gstatic.com/tactile/omnibox/star-20130618.png');
+	width: 12px;
+	height: 12px;
+	background-size: 36px 12px;
+}
+
+.text-place-star.text-place-star-empty {
+	background-position: -23px 0;
+}
+
+.text-place-star.text-place-star-half {
+	background-position: -12px 0;
+}
+
 .text-place-basic-details {
 	color: #999;
 }
