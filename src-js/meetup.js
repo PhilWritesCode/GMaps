@@ -58,6 +58,7 @@
   });
 
   meetupApp.controller('MeetupController', function($scope, ngGPlacesAPI, locationService) {
+    this.locationMarkers = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'];
     this.locations = [];
     this.bounds = new google.maps.LatLngBounds();
     this.centerOfSearchArea;
@@ -161,6 +162,11 @@
         return $scope.$broadcast('gmMarkersUpdate', 'meetup.searchResults');
       };
     })(this);
+    this.getMapLocationOptions = function(result) {
+      return angular.extend(this.mapLocationOptions, {
+        icon: "http://maps.google.com/mapfiles/marker_grey" + this.locationMarkers[this.locations.indexOf(result)] + ".png"
+      });
+    };
     this.getMapSearchAreaOptions = function() {
       if (this.locations.length > 0) {
         return this.mapSearchAreaOptions;
@@ -170,6 +176,9 @@
     };
     this.getMapSearchResultsOptions = function(result) {
       return angular.extend(this.searchResultOptions, result.selected ? this.markerSelectedIcon : result.highlighted ? this.markerHighlightedIcon : this.markerDefaultIcon);
+    };
+    this.getLocationId = function(location) {
+      return this.locationMarkers[this.locations.indexOf(location)];
     };
     this.getBaseUrl = function(fullUrl) {
       var urlParts;
@@ -182,9 +191,7 @@
       var close, currentPeriod, dayIndex, open;
       dayIndex = new Date().getDay();
       if (result.opening_hours && result.opening_hours.periods) {
-        console.log('here2');
         currentPeriod = result.opening_hours.periods[dayIndex];
-        console.log(currentPeriod);
         open = this.formatHours(currentPeriod.open.hours) + ':' + this.formatMinutes(currentPeriod.open.minutes) + " " + this.getAMPM(currentPeriod.open.hours);
         close = this.formatHours(currentPeriod.close.hours) + ':' + this.formatMinutes(currentPeriod.close.minutes) + " " + this.getAMPM(currentPeriod.close.hours);
         return open + " - " + close;
@@ -198,7 +205,6 @@
       }
     };
     this.formatMinutes = function(rawMinutes) {
-      console.log('raw minutes: ' + rawMinutes + ' length:' + rawMinutes.length);
       if (rawMinutes > 10) {
         return rawMinutes;
       } else {
@@ -246,6 +252,11 @@
         return this.triggerOpenInfoWindow(result);
       }
     };
+    this.getDirectionsUrl = function(location) {
+      if (location) {
+        return "http://maps.google.com/maps?saddr=&daddr=" + encodeURIComponent(location.formatted_address);
+      }
+    };
     this.triggerOpenInfoWindow = function(result) {
       return this.markerEvents = [
         {
@@ -284,8 +295,7 @@
       icon: "http://maps.google.com/mapfiles/arrow.png"
     };
     this.mapLocationOptions = {
-      draggable: false,
-      icon: "https://maps.google.com/mapfiles/ms/icons/blue-dot.png"
+      draggable: false
     };
     this.searchResultOptions = {
       draggable: false,

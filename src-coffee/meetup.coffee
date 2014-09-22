@@ -29,6 +29,7 @@ meetupApp.factory 'locationService', ->
 
 
 meetupApp.controller 'MeetupController', ($scope,ngGPlacesAPI, locationService) ->
+	@locationMarkers = ['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z']
 	@locations = []
 	@bounds = new google.maps.LatLngBounds()
 	@centerOfSearchArea
@@ -98,6 +99,11 @@ meetupApp.controller 'MeetupController', ($scope,ngGPlacesAPI, locationService) 
 		$scope.$apply()
 		$scope.$broadcast('gmMarkersUpdate', 'meetup.searchResults');
 
+	@getMapLocationOptions = (result) ->
+		angular.extend( @mapLocationOptions,
+			{icon: "http://maps.google.com/mapfiles/marker_grey" + @locationMarkers[@locations.indexOf(result)] + ".png"}
+		)
+
 	@getMapSearchAreaOptions = ->
 		if @locations.length > 0
 			return @mapSearchAreaOptions
@@ -114,6 +120,9 @@ meetupApp.controller 'MeetupController', ($scope,ngGPlacesAPI, locationService) 
 				@markerDefaultIcon
 		)
 
+	@getLocationId = (location) ->
+		@locationMarkers[@locations.indexOf location]
+
 	@getBaseUrl = (fullUrl) ->
 		if(fullUrl)
 			urlParts = fullUrl.split '/'
@@ -122,9 +131,7 @@ meetupApp.controller 'MeetupController', ($scope,ngGPlacesAPI, locationService) 
 	@getHoursForToday = (result) ->
 		dayIndex = new Date().getDay()
 		if result.opening_hours && result.opening_hours.periods
-			console.log 'here2'
 			currentPeriod = result.opening_hours.periods[dayIndex]
-			console.log currentPeriod
 			open = @formatHours(currentPeriod.open.hours) + ':' + @formatMinutes(currentPeriod.open.minutes) + " " + @getAMPM(currentPeriod.open.hours)
 			close = @formatHours(currentPeriod.close.hours) + ':' + @formatMinutes(currentPeriod.close.minutes) + " " + @getAMPM(currentPeriod.close.hours)
 			return open + " - " + close
@@ -136,7 +143,6 @@ meetupApp.controller 'MeetupController', ($scope,ngGPlacesAPI, locationService) 
 			return rawHours - 12
 
 	@formatMinutes = (rawMinutes) ->
-		console.log('raw minutes: ' + rawMinutes + ' length:' + rawMinutes.length)
 		if rawMinutes > 10
 			return rawMinutes
 		else
@@ -176,6 +182,10 @@ meetupApp.controller 'MeetupController', ($scope,ngGPlacesAPI, locationService) 
 			@selectResult result
 			@triggerOpenInfoWindow result
 
+	@getDirectionsUrl = (location) ->
+		if location
+			"http://maps.google.com/maps?saddr=&daddr=" + encodeURIComponent location.formatted_address
+
 	@triggerOpenInfoWindow = (result) ->
     		@markerEvents = [{event: 'openinfowindow',ids: ['result' + result.formatted_address]}];
 
@@ -189,6 +199,7 @@ meetupApp.controller 'MeetupController', ($scope,ngGPlacesAPI, locationService) 
 
 	@mapOptions = {map: {center: new google.maps.LatLng(39, -95),zoom: 4,mapTypeId: google.maps.MapTypeId.TERRAIN}};
 	@mapSearchAreaOptions = {visible: true; draggable: true, icon:"http://maps.google.com/mapfiles/arrow.png"}
-	@mapLocationOptions = {draggable: false, icon:"https://maps.google.com/mapfiles/ms/icons/blue-dot.png"}
+	@mapLocationOptions = {draggable: false}
 	@searchResultOptions = {draggable: false, clickable: true}
 	@mapHiddenMarkersOptions = {visible: false}
+

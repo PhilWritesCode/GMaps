@@ -8,6 +8,10 @@
 	overflow-y: auto;
 }
 
+.locationIdentifier {
+	font-weight: bold;
+	color: #0000ff;
+}
 
 .angular-google-map-container {
     height: 500px;
@@ -15,7 +19,7 @@
 }
 
 .infoWindow {
-	height: 100px;
+	height: 120px;
 }
 
 
@@ -27,6 +31,11 @@
 	position: relative;
 	overflow: hidden;
 	color: #666;
+}
+
+.selectedTextPlace {
+	box-shadow: 0 0 4px rgba(0,0,0,0.2);
+	background-color: #f6f6f6;
 }
 
 .text-place:hover, .text-place:focus {

@@ -26,7 +26,7 @@
                     <form name="searchForm" ng-submit="meetup.performSearch()" class="form-search">
                         <label class="control-label" style="padding-right: 5px">What do you want to do?</label>
                         <div class="input-append">
-                            <input type="text" id="searchInput" class="input-large search-query" placeholder="Enter a meetup spot!  For example: 'coffee'" title="Enter a meetup spot!  For example: 'coffee'" ng-model="meetup.searchTerm" />
+                            <input type="text" id="searchInput" class="input-large search-query" placeholder="Enter a meetup spot! " title="Enter a meetup spot!  For example: 'coffee'" ng-model="meetup.searchTerm" />
                             <input type="submit" class="btn btn-primary" value="Search!" />
                         </div>
                     </form>
@@ -42,7 +42,7 @@
                 <div class="span3">
                     <ul class="unstyled">
                         <li ng-repeat="location in meetup.locations">
-                            <i class="icon-remove-circle" title="click to remove location" ng-click="meetup.removeLocation(location)"></i>  {{location.formatted_address}}
+                            <i class="icon-remove-circle" title="click to remove location" ng-click="meetup.removeLocation(location)"></i> <span class="locationIdentifier">{{meetup.getLocationId(location)}}</span>  {{location.formatted_address}}
                         </li>
                     </ul>
                 </div>
@@ -53,11 +53,14 @@
                             <h4><a target="_blank" href="{{selectedLocation.url}}">{{selectedLocation.name}}</a></h4>
                             <div class="text-place-summary-details" >
                                 <div class="text-place-basic-details" >
-                                    <div class="text-place-address">{{selectedLocation.formatted_address.substr(0,result.formatted_address.indexOf(', United States')) }}</div>
+                                    <div class="text-place-address">{{selectedLocation.formatted_address.substr(0,selectedLocation.formatted_address.indexOf(', United States')) }}</div>
                                     <div class="text-place-phone">{{selectedLocation.formatted_phone_number}}</div>
                                 </div>
                                 <div class="text-place-basic-details" ng-show="selectedLocation.website">
                                     <span class="text-place-website"><a target="_blank" href="{{selectedLocation.website}}">{{meetup.getBaseUrl(selectedLocation.website)}}</a></span>
+                                </div>
+                                <div>
+                                    <a target="_blank" href="{{meetup.getDirectionsUrl(selectedLocation)}}">Get directions</a>
                                 </div>
                             </div>
                         </div>
@@ -65,7 +68,7 @@
                             <gm-markers gm-objects="meetup.locations"
                                         gm-id="'location' + object.formatted_address"
                                         gm-position="{lat: object.geometry.location.lat(), lng: object.geometry.location.lng()}"
-                                        gm-marker-options="meetup.mapLocationOptions">
+                                        gm-marker-options="meetup.getMapLocationOptions(object)">
                             </gm-markers>
                             <gm-markers gm-objects="meetup.centerOfSearchArea"
                                         gm-id="searchAreaMarker"
@@ -89,7 +92,11 @@
                 </div>
                 <div class="span3">
                     <div id="resultList" ng-show="meetup.searchResults">
-                        <div ng-repeat="result in meetup.searchResults" class="text-place" ng-mouseover="meetup.highlightResult(result)" ng-mouseout="meetup.unHighlightResult(result)" ng-click="meetup.toggleSelection(result)">
+                        <div ng-repeat="result in meetup.searchResults" class="text-place"
+                             ng-mouseover="meetup.highlightResult(result)"
+                             ng-mouseout="meetup.unHighlightResult(result)"
+                             ng-click="meetup.toggleSelection(result)"
+                             ng-class="{selectedTextPlace:result.selected}">
                             <div class="text-place-summary-details" >
                                 <span class="text-place-title">{{result.name}}</span>
                                 <div class="text-place-summary">
@@ -129,6 +136,9 @@
                                     </div>
                                     <div ng-show="result.reviews">
                                         <a target="_blank" class="text-place-reviews" href="{{result.url}}">Read all {{result.reviews.length}} reviews</a>
+                                    </div>
+                                    <div>
+                                        <a target="_blank" href="{{meetup.getDirectionsUrl(result)}}">Get directions</a>
                                     </div>
                                 </div>
                             </div>
