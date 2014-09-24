@@ -4,8 +4,9 @@ meetupApp.factory 'locationService', ->
 	@geocoder = new google.maps.Geocoder()
 	@searcher = new google.maps.places.PlacesService document.getElementById 'results'
 
-	@processLocation = (newLocation, startingLocation, addLocation) =>
-		@geocoder.geocode {address: newLocation, location: startingLocation}, (results, status) ->
+	@processLocation = (newLocation, centerOfSearchArea, addLocation) =>
+		console.log centerOfSearchArea
+		@geocoder.geocode {address: newLocation, location: centerOfSearchArea}, (results, status) ->
 			if status == google.maps.GeocoderStatus.OK
 				addLocation results[0]
 			else
@@ -34,7 +35,6 @@ meetupApp.controller 'MeetupController', ($scope,ngGPlacesAPI, locationService) 
 	@bounds = new google.maps.LatLngBounds()
 	@centerOfSearchArea
 	@formEntry
-	@usedEntries = []
 	@searchTerm = "coffee"
 	@searchResults
 	@markerEvents
@@ -44,8 +44,14 @@ meetupApp.controller 'MeetupController', ($scope,ngGPlacesAPI, locationService) 
 			locationService.processLocation @formEntry, @centerOfSearchArea, @addLocation
 		@formEntry = ""
 
+	@locationAlreadyEntered = (locationToCheck) ->
+		for location in @locations
+			if location.formatted_address == locationToCheck.formatted_address
+				return true
+		return false
+
 	@addLocation = (newLocation) =>
-		if(newLocation not in @locations)
+		if !@locationAlreadyEntered newLocation
 			@locations.push newLocation
 			@updateMapLocations()
 			@performSearch()
