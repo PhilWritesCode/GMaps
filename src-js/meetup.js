@@ -68,24 +68,23 @@
     this.searchResults;
     this.markerEvents;
     this.processFormEntry = function() {
-      var _ref;
-      if (this.formEntry && (_ref = this.formEntry, __indexOf.call(this.usedEntries, _ref) < 0)) {
+      if (this.formEntry) {
         locationService.processLocation(this.formEntry, this.centerOfSearchArea, this.addLocation);
-        this.usedEntries.push(this.formEntry);
       }
       return this.formEntry = "";
     };
     this.addLocation = (function(_this) {
       return function(newLocation) {
-        _this.locations.push(newLocation);
-        _this.updateMapLocations();
-        _this.performSearch();
-        return $scope.$apply();
+        if ((__indexOf.call(_this.locations, newLocation) < 0)) {
+          _this.locations.push(newLocation);
+          _this.updateMapLocations();
+          _this.performSearch();
+          return $scope.$apply();
+        }
       };
     })(this);
     this.removeLocation = function(locationToRemove) {
-      this.locations.pop(locationToRemove);
-      this.usedEntries.pop(locationToRemove);
+      this.locations.splice(this.locations.indexOf(locationToRemove), 1);
       this.updateMapLocations();
       return this.performSearch();
     };

@@ -40,20 +40,19 @@ meetupApp.controller 'MeetupController', ($scope,ngGPlacesAPI, locationService) 
 	@markerEvents
 
 	@processFormEntry = ->
-		if @formEntry && @formEntry not in @usedEntries
+		if @formEntry
 			locationService.processLocation @formEntry, @centerOfSearchArea, @addLocation
-			@usedEntries.push @formEntry
 		@formEntry = ""
 
 	@addLocation = (newLocation) =>
-		@locations.push newLocation
-		@updateMapLocations()
-		@performSearch()
-		$scope.$apply()
+		if(newLocation not in @locations)
+			@locations.push newLocation
+			@updateMapLocations()
+			@performSearch()
+			$scope.$apply()
 
 	@removeLocation = (locationToRemove) ->
-		@locations.pop locationToRemove
-		@usedEntries.pop locationToRemove
+		@locations.splice @locations.indexOf(locationToRemove), 1
 		@updateMapLocations()
 		@performSearch()
 
