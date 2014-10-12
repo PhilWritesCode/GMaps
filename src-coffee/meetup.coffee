@@ -5,7 +5,6 @@ meetupApp.factory 'locationService', ->
 	@searcher = new google.maps.places.PlacesService document.getElementById 'results'
 
 	@processLocation = (newLocation, centerOfSearchArea, addLocation) =>
-		console.log centerOfSearchArea
 		@geocoder.geocode {address: newLocation, location: centerOfSearchArea}, (results, status) ->
 			if status == google.maps.GeocoderStatus.OK
 				addLocation results[0]
@@ -31,6 +30,7 @@ meetupApp.factory 'locationService', ->
 
 meetupApp.controller 'MeetupController', ($scope,ngGPlacesAPI, locationService) ->
 	@locationMarkers = ['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z']
+	@clickDisablingNodes = ['SELECT', 'A', 'INPUT']
 	@locations = []
 	@bounds = new google.maps.LatLngBounds()
 	@centerOfSearchArea
@@ -38,6 +38,9 @@ meetupApp.controller 'MeetupController', ($scope,ngGPlacesAPI, locationService) 
 	@searchTerm = "coffee"
 	@searchResults
 	@markerEvents
+
+	@test = ->
+		console.log("test executed")
 
 	@processFormEntry = ->
 		if @formEntry
@@ -137,9 +140,12 @@ meetupApp.controller 'MeetupController', ($scope,ngGPlacesAPI, locationService) 
 		dayIndex = new Date().getDay()
 		if result.opening_hours && result.opening_hours.periods
 			currentPeriod = result.opening_hours.periods[dayIndex]
-			open = @formatHours(currentPeriod.open.hours) + ':' + @formatMinutes(currentPeriod.open.minutes) + " " + @getAMPM(currentPeriod.open.hours)
-			close = @formatHours(currentPeriod.close.hours) + ':' + @formatMinutes(currentPeriod.close.minutes) + " " + @getAMPM(currentPeriod.close.hours)
-			return open + " - " + close
+			if currentPeriod
+				open = @formatHours(currentPeriod.open.hours) + ':' + @formatMinutes(currentPeriod.open.minutes) + " " + @getAMPM(currentPeriod.open.hours)
+				close = @formatHours(currentPeriod.close.hours) + ':' + @formatMinutes(currentPeriod.close.minutes) + " " + @getAMPM(currentPeriod.close.hours)
+				return open + " - " + close
+			else
+				return "Closed"
 
 	@formatHours = (rawHours) ->
 		if rawHours < 13
@@ -187,15 +193,35 @@ meetupApp.controller 'MeetupController', ($scope,ngGPlacesAPI, locationService) 
 			@selectResult result
 			@triggerOpenInfoWindow result
 
-	@getDirectionsUrl = (location) ->
-		if location
-			"http://maps.google.com/maps?saddr=&daddr=" + encodeURIComponent location.formatted_address
+	@handleTextEntryClicked = (result, event) ->
+		if event.target.nodeName in @clickDisablingNodes
+		else
+			@toggleSelection(result)
+
+	@getDirections = (fromLocation, toLocation) ->
+		console.log("from " + fromLocation + " to " + toLocation)
+		if fromLocation && toLocation
+			link = "http://maps.google.com/maps?saddr=" + fromLocation.formatted_address + "&daddr=" +  toLocation.formatted_address
+			console.log(link)
+			window.open(link, "_blank");
+
+		return true
 
 	@triggerOpenInfoWindow = (result) ->
     		@markerEvents = [{event: 'openinfowindow',ids: ['result' + result.formatted_address]}];
 
 	@triggerCloseInfoWindow = (result) ->
     		@markerEvents = [{event: 'closeinfowindow',ids: ['result' + result.formatted_address]}];
+
+	@getNormalizedAddress = (location) ->
+		if location
+			address = location.formatted_address
+			if address.indexOf(", USA") > 0
+				return address.substr(0, address.indexOf(", USA"))
+			else if address.indexOf(", United States") > 0
+				return address.substr(0, address.indexOf(", United States"))
+			else
+				return address
 
 
 	@markerSelectedIcon = {icon: 'https://maps.gstatic.com/mapfiles/ms2/micons/yellow-dot.png'}

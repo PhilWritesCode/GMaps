@@ -42,25 +42,22 @@
                 <div class="span3">
                     <ul class="unstyled">
                         <li ng-repeat="location in meetup.locations">
-                            <i class="icon-remove-circle" title="click to remove location" ng-click="meetup.removeLocation(location)"></i> <span class="locationIdentifier">{{meetup.getLocationId(location)}}</span>  {{location.formatted_address}}
+                            <i class="icon-remove-circle" title="click to remove location" ng-click="meetup.removeLocation(location)"></i> <span class="locationIdentifier">{{meetup.getLocationId(location)}}</span>  {{meetup.getNormalizedAddress(location)}}
                         </li>
                     </ul>
                 </div>
                 <div class="span6">
                     <div id="map_canvas">
-                        <div gm-info-window="infoWindow" class="infoWindow well"
+                        <div gm-info-window="infoWindow" class="infoWindow well infoPopup"
                              gm-on-closeclick="meetup.deSelectResult(selectedLocation)">
                             <h4><a target="_blank" href="{{selectedLocation.url}}">{{selectedLocation.name}}</a></h4>
                             <div class="text-place-summary-details" >
                                 <div class="text-place-basic-details" >
-                                    <div class="text-place-address">{{selectedLocation.formatted_address.substr(0,selectedLocation.formatted_address.indexOf(', United States')) }}</div>
+                                    <div class="text-place-address">{{meetup.getNormalizedAddress(selectedLocation) }}</div>
                                     <div class="text-place-phone">{{selectedLocation.formatted_phone_number}}</div>
                                 </div>
                                 <div class="text-place-basic-details" ng-show="selectedLocation.website">
                                     <span class="text-place-website"><a target="_blank" href="{{selectedLocation.website}}">{{meetup.getBaseUrl(selectedLocation.website)}}</a></span>
-                                </div>
-                                <div>
-                                    <a target="_blank" href="{{meetup.getDirectionsUrl(selectedLocation)}}">Get directions</a>
                                 </div>
                             </div>
                         </div>
@@ -91,13 +88,14 @@
                     </div>
                 </div>
                 <div class="span3">
-                    <div id="resultList" ng-show="meetup.searchResults">
+                    <div id="resultList" ng-show="meetup.searchResults" class="text-mode-right">
                         <div ng-repeat="result in meetup.searchResults" class="text-place"
+                             scroll-if="result.selected"
                              ng-mouseover="meetup.highlightResult(result)"
                              ng-mouseout="meetup.unHighlightResult(result)"
-                             ng-click="meetup.toggleSelection(result)"
+                             ng-click="meetup.handleTextEntryClicked(result, $event)"
                              ng-class="{selectedTextPlace:result.selected}">
-                            <div class="text-place-summary-details" >
+                            <div class="text-place-summary-details text-place-has-thumbnail" >
                                 <span class="text-place-title">{{result.name}}</span>
                                 <div class="text-place-summary">
                                     <span ng-show="result.rating">
@@ -122,14 +120,14 @@
                                     </span>
                                 </div>
                                 <div class="text-place-basic-details" jstcache="0">
-                                    <span class="text-place-address">{{result.formatted_address.substr(0,result.formatted_address.indexOf(', United States')) }}</span>
+                                    <span class="text-place-address">{{ meetup.getNormalizedAddress(result) }}</span>
                                 </div>
                                 <div ng-show="result.selected">
-                                    <div class="text-place-basic-details" ng-show="selectedLocation.website">
-                                        <span class="text-place-website"><a target="_blank" href="{{selectedLocation.website}}">{{meetup.getBaseUrl(selectedLocation.website)}}</a></span>
+                                    <div class="text-place-basic-details" ng-show="result.website">
+                                        <span class="text-place-website"><a target="_blank" href="{{result.website}}">{{meetup.getBaseUrl(result.website)}}</a></span>
                                     </div>
-                                    <div class="text-place-hours">
-                                        <span>Open today:</span>
+                                    <div class="text-place-hours" ng-show="result.opening_hours && result.opening_hours.periods">
+                                        <span>Today's hours:</span>
                                         <div class="text-place-open-hours">
                                             {{meetup.getHoursForToday(result)}}
                                         </div>
@@ -138,12 +136,24 @@
                                         <a target="_blank" class="text-place-reviews" href="{{result.url}}">Read all {{result.reviews.length}} reviews</a>
                                     </div>
                                     <div>
-                                        <a target="_blank" href="{{meetup.getDirectionsUrl(result)}}">Get directions</a>
+                                        <form name="getDirectionsInDetails"
+                                              ng-submit="meetup.getDirections(fromLocation, result)"
+                                              class="getDirectionsForm"
+                                              ng-init="fromLocation = meetup.locations[0]">
+                                            <label class="directionFormLabel">Get directions from</label>
+                                            <select ng-model="fromLocation"
+                                                    class="directionLocationSelector"
+                                                    ng-options="meetup.getNormalizedAddress(location) for  location in meetup.locations"></select>
+                                            <input type="submit"
+                                                   class="btn btn-mini directionFormButton"
+                                                   value="Go!" />
+                                        </form>
                                     </div>
                                 </div>
                             </div>
-                            <img ng-show="result.photos[0]" ng-src="{{result.photos[0].getUrl({'maxWidth': 90, 'maxHeight': 90})}}" class="text-place-thumbnail"/>
-
+                            <img ng-show="result.photos[0]"
+                                 ng-src="{{result.photos[0].getUrl({'maxWidth': 90, 'maxHeight': 90})}}"
+                                 class="text-place-thumbnail"/>
                         </div>
                     </div>
                 </div>
