@@ -329,7 +329,7 @@
       }
     };
     this.nextPageAvailable = function() {
-      return this.searchPages.length - 1 > this.searchPageIndex || this.searchPaginationObject.hasNextPage;
+      return this.searchPages.length - 1 > this.searchPageIndex || (this.searchPaginationObject && this.searchPaginationObject.hasNextPage);
     };
     this.getSearchResultPageNumbers = function() {
       if (this.getDisplayedResults()) {

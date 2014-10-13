@@ -234,7 +234,7 @@ meetupApp.controller 'MeetupController', ($scope,ngGPlacesAPI, locationService) 
 				return address
 
 	@nextPageAvailable = ->
-		@searchPages.length-1 > @searchPageIndex || @searchPaginationObject.hasNextPage
+		@searchPages.length-1 > @searchPageIndex || (@searchPaginationObject &&@searchPaginationObject.hasNextPage)
 
 	@getSearchResultPageNumbers = ->
 		if @getDisplayedResults()
