@@ -29,11 +29,12 @@
           location: searchArea,
           radius: 5
         }, function(results, status, pagination) {
+          console.log("callback!");
           if (status === google.maps.places.PlacesServiceStatus.ZERO_RESULTS) {
             alert('No results!');
             return;
           }
-          return displayResults(results);
+          return displayResults(results, pagination);
         });
       };
     })(this);
@@ -65,8 +66,10 @@
     this.centerOfSearchArea;
     this.formEntry;
     this.searchTerm = "coffee";
-    this.searchResults;
     this.markerEvents;
+    this.searchPages = [];
+    this.searchPageIndex = 0;
+    this.searchPaginationObject;
     this.test = function() {
       return console.log("test executed");
     };
@@ -119,14 +122,14 @@
     this.updateMapSearchResults = (function(_this) {
       return function() {
         var location, result, _i, _j, _len, _len1, _ref, _ref1, _results;
-        if (_this.searchResults.length > 0) {
+        if (_this.getDisplayedResults().length > 0) {
           _this.bounds = new google.maps.LatLngBounds();
           _ref = _this.locations;
           for (_i = 0, _len = _ref.length; _i < _len; _i++) {
             location = _ref[_i];
             _this.bounds.extend(location.geometry.location);
           }
-          _ref1 = _this.searchResults;
+          _ref1 = _this.getDisplayedResults();
           _results = [];
           for (_j = 0, _len1 = _ref1.length; _j < _len1; _j++) {
             result = _ref1[_j];
@@ -142,24 +145,33 @@
     };
     this.performSearch = (function(_this) {
       return function() {
+        _this.searchPages = [];
+        _this.searchPageIndex = 0;
         if (!_this.searchTerm || _this.locations.length === 0) {
-          _this.searchResults = [];
           return;
         }
         return locationService.performSearch(_this.centerOfSearchArea, _this.searchTerm, _this.displayResults);
       };
     })(this);
     this.displayResults = (function(_this) {
-      return function(results) {
-        _this.searchResults = results.slice(0, 10);
+      return function(results, pagination) {
+        _this.searchPaginationObject = pagination;
+        _this.searchPages.push(results.slice(0, 10));
+        _this.searchPages.push(results.slice(10));
+        if (_this.searchPages.length > 2) {
+          _this.searchPageIndex++;
+        }
         _this.updateMapSearchResults();
         return $scope.$apply();
       };
     })(this);
+    this.getDisplayedResults = function() {
+      return this.searchPages[this.searchPageIndex];
+    };
     this.addLocationDetail = (function(_this) {
       return function(place) {
         var result, _i, _len, _ref;
-        _ref = _this.searchResults;
+        _ref = _this.getDisplayedResults();
         for (_i = 0, _len = _ref.length; _i < _len; _i++) {
           result = _ref[_i];
           if (result.place_id === place.place_id) {
@@ -172,7 +184,7 @@
           }
         }
         $scope.$apply();
-        return $scope.$broadcast('gmMarkersUpdate', 'meetup.searchResults');
+        return $scope.$broadcast('gmMarkersUpdate', 'meetup.getDisplayedResults()');
       };
     })(this);
     this.getMapLocationOptions = function(result) {
@@ -240,25 +252,25 @@
       if (thisResult.website === void 0) {
         locationService.getLocationDetails(thisResult.place_id, this.addLocationDetail);
       }
-      _ref = this.searchResults;
+      _ref = this.getDisplayedResults();
       for (_i = 0, _len = _ref.length; _i < _len; _i++) {
         result = _ref[_i];
         result.selected = false;
       }
       thisResult.selected = true;
-      return $scope.$broadcast('gmMarkersUpdate', 'meetup.searchResults');
+      return $scope.$broadcast('gmMarkersUpdate', 'meetup.getDisplayedResults()');
     };
     this.deSelectResult = function(thisResult) {
       thisResult.selected = false;
-      return $scope.$broadcast('gmMarkersUpdate', 'meetup.searchResults');
+      return $scope.$broadcast('gmMarkersUpdate', 'meetup.getDisplayedResults()');
     };
     this.highlightResult = function(result) {
       result.highlighted = true;
-      return $scope.$broadcast('gmMarkersUpdate', 'meetup.searchResults');
+      return $scope.$broadcast('gmMarkersUpdate', 'meetup.getDisplayedResults()');
     };
     this.unHighlightResult = function(result) {
       result.highlighted = false;
-      return $scope.$broadcast('gmMarkersUpdate', 'meetup.searchResults');
+      return $scope.$broadcast('gmMarkersUpdate', 'meetup.getDisplayedResults()');
     };
     this.toggleSelection = function(result) {
       if (result.selected) {
@@ -314,6 +326,28 @@
         } else {
           return address;
         }
+      }
+    };
+    this.nextPageAvailable = function() {
+      return this.searchPages.length - 1 > this.searchPageIndex || this.searchPaginationObject.hasNextPage;
+    };
+    this.getSearchResultPageNumbers = function() {
+      if (this.getDisplayedResults()) {
+        return (this.searchPageIndex * 10 + 1) + " - " + (this.searchPageIndex * 10 + this.getDisplayedResults().length);
+      }
+    };
+    this.getPreviousPage = function() {
+      if (this.searchPageIndex > 0) {
+        this.searchPageIndex--;
+        return this.updateMapSearchResults();
+      }
+    };
+    this.getNextPage = function() {
+      if (this.searchPages.length - 1 > this.searchPageIndex) {
+        this.searchPageIndex++;
+        return this.updateMapSearchResults();
+      } else if (this.searchPaginationObject.hasNextPage) {
+        return this.searchPaginationObject.nextPage();
       }
     };
     this.markerSelectedIcon = {

@@ -33,7 +33,7 @@
                 </div>
                 <div class="span3">
                     <div id="results"></div>
-                    <div ng-show="meetup.searchResults.length > 0">
+                    <div ng-show="meetup.getDisplayedResults().length > 0">
                         <h3>Results</h3>
                     </div>
                 </div>
@@ -73,7 +73,7 @@
                                         gm-marker-options="meetup.getMapSearchAreaOptions()"
                                         gm-on-dragend="meetup.updateSearchArea(object, marker)">
                             </gm-markers>
-                            <gm-markers gm-objects="meetup.searchResults"
+                            <gm-markers gm-objects="meetup.getDisplayedResults()"
                                         gm-id="'result' + object.formatted_address"
                                         gm-position="{lat: object.geometry.location.lat(), lng: object.geometry.location.lng()}"
                                         gm-marker-options="meetup.getMapSearchResultsOptions(object)"
@@ -88,8 +88,8 @@
                     </div>
                 </div>
                 <div class="span3">
-                    <div id="resultList" ng-show="meetup.searchResults" class="text-mode-right">
-                        <div ng-repeat="result in meetup.searchResults" class="text-place"
+                    <div id="resultList" ng-show="meetup.getDisplayedResults()" class="text-mode-right">
+                        <div ng-repeat="result in meetup.getDisplayedResults()" class="text-place"
                              scroll-if="result.selected"
                              ng-mouseover="meetup.highlightResult(result)"
                              ng-mouseout="meetup.unHighlightResult(result)"
@@ -154,6 +154,11 @@
                             <img ng-show="result.photos[0]"
                                  ng-src="{{result.photos[0].getUrl({'maxWidth': 90, 'maxHeight': 90})}}"
                                  class="text-place-thumbnail"/>
+                        </div>
+                        <div class="text-place-pagination">
+                            <a ng-show="meetup.searchPageIndex > 0" class="text-place-pagination-button" ng-click="meetup.getPreviousPage()">&#171; Previous</a>
+                            <span> Showing results {{meetup.getSearchResultPageNumbers()}}</span>
+                            <a ng-show="meetup.nextPageAvailable()" class="text-place-pagination-button" ng-click="meetup.getNextPage()">Next &#187;</a>
                         </div>
                     </div>
                 </div>

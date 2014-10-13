@@ -13,10 +13,11 @@ meetupApp.factory 'locationService', ->
 
 	@performSearch = (searchArea, searchTerm, displayResults) =>
 		@searcher.textSearch {query : searchTerm, location : searchArea, radius: 5},(results, status, pagination) ->
+			console.log("callback!");
 			if status == google.maps.places.PlacesServiceStatus.ZERO_RESULTS
 				alert 'No results!'
 				return
-			displayResults results
+			displayResults results, pagination
 
 	@getLocationDetails = (locationReferenceId, addLocationDetails) =>
 		@searcher.getDetails {placeId : locationReferenceId},(place, status) ->
@@ -36,8 +37,10 @@ meetupApp.controller 'MeetupController', ($scope,ngGPlacesAPI, locationService) 
 	@centerOfSearchArea
 	@formEntry
 	@searchTerm = "coffee"
-	@searchResults
 	@markerEvents
+	@searchPages = []
+	@searchPageIndex = 0
+	@searchPaginationObject
 
 	@test = ->
 		console.log("test executed")
@@ -73,11 +76,11 @@ meetupApp.controller 'MeetupController', ($scope,ngGPlacesAPI, locationService) 
 		@centerOfSearchArea = @bounds.getCenter()
 
 	@updateMapSearchResults = =>
-		if@searchResults.length > 0
+		if @getDisplayedResults().length > 0
 			@bounds = new google.maps.LatLngBounds()
 			for location in @locations
 				@bounds.extend location.geometry.location
-			for result in @searchResults
+			for result in @getDisplayedResults()
 				@bounds.extend result.geometry.location
 
 	@updateSearchArea = (object, marker) ->
@@ -85,18 +88,26 @@ meetupApp.controller 'MeetupController', ($scope,ngGPlacesAPI, locationService) 
 		@performSearch()
 
 	@performSearch = =>
+		@searchPages = []
+		@searchPageIndex = 0
 		if !@searchTerm || @locations.length == 0
-			@searchResults = []
 			return
 		locationService.performSearch @centerOfSearchArea, @searchTerm, @displayResults
 
-	@displayResults = (results) =>
-		@searchResults = results.slice(0,10)
+	@displayResults = (results, pagination) =>
+		@searchPaginationObject = pagination
+		@searchPages.push results.slice(0,10)
+		@searchPages.push results.slice(10)
+		if @searchPages.length > 2
+			@searchPageIndex++
 		@updateMapSearchResults()
 		$scope.$apply()
 
+	@getDisplayedResults = ->
+		return @searchPages[@searchPageIndex]
+
 	@addLocationDetail = (place) =>
-		for result in @searchResults
+		for result in @getDisplayedResults()
 			if result.place_id == place.place_id
 				result.reviews = place.reviews
 				result.formatted_phone_number = place.formatted_phone_number
@@ -105,7 +116,7 @@ meetupApp.controller 'MeetupController', ($scope,ngGPlacesAPI, locationService) 
 				result.opening_hours = place.opening_hours
 				break;
 		$scope.$apply()
-		$scope.$broadcast('gmMarkersUpdate', 'meetup.searchResults');
+		$scope.$broadcast('gmMarkersUpdate', 'meetup.getDisplayedResults()');
 
 	@getMapLocationOptions = (result) ->
 		angular.extend( @mapLocationOptions,
@@ -168,22 +179,22 @@ meetupApp.controller 'MeetupController', ($scope,ngGPlacesAPI, locationService) 
 	@selectResult = (thisResult) ->
 		if(thisResult.website == undefined)
 			locationService.getLocationDetails thisResult.place_id, @addLocationDetail
-		for result in @searchResults
+		for result in @getDisplayedResults()
 			result.selected = false
 		thisResult.selected = true
-		$scope.$broadcast('gmMarkersUpdate', 'meetup.searchResults');
+		$scope.$broadcast('gmMarkersUpdate', 'meetup.getDisplayedResults()');
 
 	@deSelectResult = (thisResult) ->
 		thisResult.selected = false
-		$scope.$broadcast('gmMarkersUpdate', 'meetup.searchResults');
+		$scope.$broadcast('gmMarkersUpdate', 'meetup.getDisplayedResults()');
 
 	@highlightResult = (result) ->
     		result.highlighted = true
-    		$scope.$broadcast('gmMarkersUpdate', 'meetup.searchResults');
+    		$scope.$broadcast('gmMarkersUpdate', 'meetup.getDisplayedResults()');
 
 	@unHighlightResult = (result) ->
     		result.highlighted = false
-    		$scope.$broadcast('gmMarkersUpdate', 'meetup.searchResults');
+    		$scope.$broadcast('gmMarkersUpdate', 'meetup.getDisplayedResults()');
 
 	@toggleSelection = (result) ->
 		if result.selected
@@ -204,7 +215,6 @@ meetupApp.controller 'MeetupController', ($scope,ngGPlacesAPI, locationService) 
 			link = "http://maps.google.com/maps?saddr=" + fromLocation.formatted_address + "&daddr=" +  toLocation.formatted_address
 			console.log(link)
 			window.open(link, "_blank");
-
 		return true
 
 	@triggerOpenInfoWindow = (result) ->
@@ -223,6 +233,24 @@ meetupApp.controller 'MeetupController', ($scope,ngGPlacesAPI, locationService) 
 			else
 				return address
 
+	@nextPageAvailable = ->
+		@searchPages.length-1 > @searchPageIndex || @searchPaginationObject.hasNextPage
+
+	@getSearchResultPageNumbers = ->
+		if @getDisplayedResults()
+			(@searchPageIndex * 10 + 1) + " - " + (@searchPageIndex * 10 + @getDisplayedResults().length)
+
+	@getPreviousPage = ->
+		if @searchPageIndex > 0
+			@searchPageIndex--
+			@updateMapSearchResults()
+
+	@getNextPage = ->
+		if @searchPages.length-1 > @searchPageIndex
+			@searchPageIndex++
+			@updateMapSearchResults()
+		else if @searchPaginationObject.hasNextPage
+			@searchPaginationObject.nextPage()
 
 	@markerSelectedIcon = {icon: 'https://maps.gstatic.com/mapfiles/ms2/micons/yellow-dot.png'}
 	@markerHighlightedIcon = {icon: 'http://labs.google.com/ridefinder/images/mm_20_yellow.png'}
