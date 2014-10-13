@@ -38,6 +38,7 @@
 }
 
 .text-mode-right {
+	width: 100%;
 	display: inline-block;
 	position: relative;
 	min-width: 300px;
