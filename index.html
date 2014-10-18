@@ -7,7 +7,7 @@
 		<link rel="stylesheet" type="text/css" href="css/meetup.css">
         <link rel="stylesheet" type="text/css" href="css/bootstrap.min.css">
         <link rel="stylesheet" type="text/css" href="css/bootstrap-responsive.min.css">
-        <link rel="stylesheet" type="text/css" href="http://netdna.bootstrapcdn.com/font-awesome/3.2.1/css/font-awesome.css" >
+        <link rel="stylesheet" type="text/css" href="//netdna.bootstrapcdn.com/font-awesome/3.2.1/css/font-awesome.css" >
 
 	</head>
 	<body ng-controller="MeetupController as meetup">
@@ -34,14 +34,14 @@
                         </form>
                         <ul class="unstyled locationList">
                             <li ng-repeat="location in meetup.locations">
-                                <i class="icon-remove-circle" height="50px" title="click to remove location" ng-click="meetup.removeLocation(location)"></i> <span class="badge">{{meetup.getLocationId(location)}}</span>  {{meetup.getNormalizedAddress(location)}}
+                                <i class="icon-remove-circle deleteIcon" title="click to remove location" ng-click="meetup.removeLocation(location)"></i> <span class="badge">{{meetup.getLocationId(location)}}</span>  {{meetup.getNormalizedAddress(location)}}
                             </li>
                         </ul>
                         <div ng-show="meetup.locations.length == 0" class="instructions">
                             <p>Enter the starting location for each member of your group, one at a time, in the box above.</p>
                         </div>
                         <div ng-show="meetup.locations.length == 0" class="instructions">
-                            <p>Then, enter the type of place you'd like to meet in the search box to the right, and click Search!</p>
+                            <p>Then, enter the type of place you'd like to meet in the search box above the map, and click Search!</p>
                         </div>
                     </div>
                     <div class="span6">
@@ -100,7 +100,7 @@
                         <div ng-show="meetup.getDisplayedResults().length > 0" class="resultsLabel">
                             <h2>Results</h2>
                         </div>
-                        <div id="resultList" ng-show="meetup.getDisplayedResults()" class="text-mode-right">
+                        <div id="resultList" ng-controller="ResultListController as resultCtrl" ng-show="meetup.getDisplayedResults()" class="text-mode-right">
                             <div ng-repeat="result in meetup.getDisplayedResults()" class="text-place"
                                  scroll-if="result.selected"
                                  ng-mouseover="meetup.highlightResult(result)"
@@ -141,7 +141,7 @@
                                         <div class="text-place-hours" ng-show="result.opening_hours && result.opening_hours.periods">
                                             <span>Today's hours:</span>
                                             <div class="text-place-open-hours">
-                                                {{meetup.getHoursForToday(result)}}
+                                                {{resultCtrl.getHoursForToday(result)}}
                                             </div>
                                         </div>
                                         <div ng-show="result.reviews">

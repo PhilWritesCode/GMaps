@@ -49,18 +49,18 @@ meetupApp.controller 'MeetupController', ($scope,ngGPlacesAPI, locationService) 
 			locationService.processLocation @locationFormEntry, @centerOfSearchArea, @addLocation
 		@locationFormEntry = ""
 
-	@locationAlreadyEntered = (locationToCheck) ->
-		for location in @locations
-			if location.formatted_address == locationToCheck.formatted_address
-				return true
-		return false
-
 	@addLocation = (newLocation) =>
 		if !@locationAlreadyEntered newLocation
 			@locations.push newLocation
 			@updateMapLocations()
 			@performSearch()
 			$scope.$apply()
+
+	@locationAlreadyEntered = (locationToCheck) ->
+		for location in @locations
+			if location.formatted_address == locationToCheck.formatted_address
+				return true
+		return false
 
 	@removeLocation = (locationToRemove) ->
 		@locations.splice @locations.indexOf(locationToRemove), 1
@@ -146,35 +146,6 @@ meetupApp.controller 'MeetupController', ($scope,ngGPlacesAPI, locationService) 
 		if(fullUrl)
 			urlParts = fullUrl.split '/'
 			urlParts[2]
-
-	@getHoursForToday = (result) ->
-		dayIndex = new Date().getDay()
-		if result.opening_hours && result.opening_hours.periods
-			currentPeriod = result.opening_hours.periods[dayIndex]
-			if currentPeriod
-				open = @formatHours(currentPeriod.open.hours) + ':' + @formatMinutes(currentPeriod.open.minutes) + " " + @getAMPM(currentPeriod.open.hours)
-				close = @formatHours(currentPeriod.close.hours) + ':' + @formatMinutes(currentPeriod.close.minutes) + " " + @getAMPM(currentPeriod.close.hours)
-				return open + " - " + close
-			else
-				return "Closed"
-
-	@formatHours = (rawHours) ->
-		if rawHours < 13
-			return rawHours
-		else
-			return rawHours - 12
-
-	@formatMinutes = (rawMinutes) ->
-		if rawMinutes > 10
-			return rawMinutes
-		else
-			return rawMinutes + "0"
-
-	@getAMPM = (rawHours) ->
-		if rawHours < 12
-			return "am"
-		else
-			return "pm"
 
 	@selectResult = (thisResult) ->
 		if(thisResult.website == undefined)
@@ -262,3 +233,33 @@ meetupApp.controller 'MeetupController', ($scope,ngGPlacesAPI, locationService) 
 	@searchResultOptions = {draggable: false, clickable: true}
 	@mapHiddenMarkersOptions = {visible: false}
 
+meetupApp.controller 'ResultListController', ($scope) ->
+
+	@getHoursForToday = (result) ->
+		dayIndex = new Date().getDay()
+		if result.opening_hours && result.opening_hours.periods
+			currentPeriod = result.opening_hours.periods[dayIndex]
+			if currentPeriod
+				open = @formatHours(currentPeriod.open.hours) + ':' + @formatMinutes(currentPeriod.open.minutes) + " " + @getAMPM(currentPeriod.open.hours)
+				close = @formatHours(currentPeriod.close.hours) + ':' + @formatMinutes(currentPeriod.close.minutes) + " " + @getAMPM(currentPeriod.close.hours)
+				return open + " - " + close
+			else
+				return "Closed"
+
+	@formatHours = (rawHours) ->
+		if rawHours < 13
+			return rawHours
+		else
+			return rawHours - 12
+
+	@formatMinutes = (rawMinutes) ->
+		if rawMinutes > 10
+			return rawMinutes
+		else
+			return rawMinutes + "0"
+
+	@getAMPM = (rawHours) ->
+		if rawHours < 12
+			return "am"
+		else
+			return "pm"

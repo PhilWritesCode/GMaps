@@ -78,6 +78,16 @@
       }
       return this.locationFormEntry = "";
     };
+    this.addLocation = (function(_this) {
+      return function(newLocation) {
+        if (!_this.locationAlreadyEntered(newLocation)) {
+          _this.locations.push(newLocation);
+          _this.updateMapLocations();
+          _this.performSearch();
+          return $scope.$apply();
+        }
+      };
+    })(this);
     this.locationAlreadyEntered = function(locationToCheck) {
       var location, _i, _len, _ref;
       _ref = this.locations;
@@ -89,16 +99,6 @@
       }
       return false;
     };
-    this.addLocation = (function(_this) {
-      return function(newLocation) {
-        if (!_this.locationAlreadyEntered(newLocation)) {
-          _this.locations.push(newLocation);
-          _this.updateMapLocations();
-          _this.performSearch();
-          return $scope.$apply();
-        }
-      };
-    })(this);
     this.removeLocation = function(locationToRemove) {
       this.locations.splice(this.locations.indexOf(locationToRemove), 1);
       this.updateMapLocations();
@@ -210,41 +210,6 @@
       if (fullUrl) {
         urlParts = fullUrl.split('/');
         return urlParts[2];
-      }
-    };
-    this.getHoursForToday = function(result) {
-      var close, currentPeriod, dayIndex, open;
-      dayIndex = new Date().getDay();
-      if (result.opening_hours && result.opening_hours.periods) {
-        currentPeriod = result.opening_hours.periods[dayIndex];
-        if (currentPeriod) {
-          open = this.formatHours(currentPeriod.open.hours) + ':' + this.formatMinutes(currentPeriod.open.minutes) + " " + this.getAMPM(currentPeriod.open.hours);
-          close = this.formatHours(currentPeriod.close.hours) + ':' + this.formatMinutes(currentPeriod.close.minutes) + " " + this.getAMPM(currentPeriod.close.hours);
-          return open + " - " + close;
-        } else {
-          return "Closed";
-        }
-      }
-    };
-    this.formatHours = function(rawHours) {
-      if (rawHours < 13) {
-        return rawHours;
-      } else {
-        return rawHours - 12;
-      }
-    };
-    this.formatMinutes = function(rawMinutes) {
-      if (rawMinutes > 10) {
-        return rawMinutes;
-      } else {
-        return rawMinutes + "0";
-      }
-    };
-    this.getAMPM = function(rawHours) {
-      if (rawHours < 12) {
-        return "am";
-      } else {
-        return "pm";
       }
     };
     this.selectResult = function(thisResult) {
@@ -380,6 +345,44 @@
     };
     return this.mapHiddenMarkersOptions = {
       visible: false
+    };
+  });
+
+  meetupApp.controller('ResultListController', function($scope) {
+    this.getHoursForToday = function(result) {
+      var close, currentPeriod, dayIndex, open;
+      dayIndex = new Date().getDay();
+      if (result.opening_hours && result.opening_hours.periods) {
+        currentPeriod = result.opening_hours.periods[dayIndex];
+        if (currentPeriod) {
+          open = this.formatHours(currentPeriod.open.hours) + ':' + this.formatMinutes(currentPeriod.open.minutes) + " " + this.getAMPM(currentPeriod.open.hours);
+          close = this.formatHours(currentPeriod.close.hours) + ':' + this.formatMinutes(currentPeriod.close.minutes) + " " + this.getAMPM(currentPeriod.close.hours);
+          return open + " - " + close;
+        } else {
+          return "Closed";
+        }
+      }
+    };
+    this.formatHours = function(rawHours) {
+      if (rawHours < 13) {
+        return rawHours;
+      } else {
+        return rawHours - 12;
+      }
+    };
+    this.formatMinutes = function(rawMinutes) {
+      if (rawMinutes > 10) {
+        return rawMinutes;
+      } else {
+        return rawMinutes + "0";
+      }
+    };
+    return this.getAMPM = function(rawHours) {
+      if (rawHours < 12) {
+        return "am";
+      } else {
+        return "pm";
+      }
     };
   });
 
