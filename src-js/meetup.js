@@ -3,7 +3,7 @@
   var meetupApp,
     __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; };
 
-  meetupApp = angular.module('meetupApp', ['AngularGM', 'ngGPlaces']);
+  meetupApp = angular.module('meetupApp', ['AngularGM', 'ngGPlaces', 'ngAutocomplete']);
 
   meetupApp.factory('locationService', function() {
     this.geocoder = new google.maps.Geocoder();
@@ -17,7 +17,7 @@
           if (status === google.maps.GeocoderStatus.OK) {
             return addLocation(results[0]);
           } else {
-            return alert("Failed!  Status: " + status);
+            return alert("Location not found!  Please try again, or add a different location.");
           }
         });
       };
@@ -29,9 +29,8 @@
           location: searchArea,
           radius: 5
         }, function(results, status, pagination) {
-          console.log("callback!");
           if (status === google.maps.places.PlacesServiceStatus.ZERO_RESULTS) {
-            alert('No results!');
+            alert("No results found!  Please enter a different search term.");
             return;
           }
           return displayResults(results, pagination);
@@ -44,7 +43,7 @@
           placeId: locationReferenceId
         }, function(place, status) {
           if (status !== google.maps.places.PlacesServiceStatus.OK) {
-            alert('Detail error!');
+            console.log("error fetching location details.");
             return;
           }
           return addLocationDetails(place);
@@ -64,7 +63,7 @@
     this.locations = [];
     this.bounds = new google.maps.LatLngBounds();
     this.centerOfSearchArea;
-    this.formEntry;
+    this.locationFormEntry;
     this.searchTerm = "coffee";
     this.markerEvents;
     this.searchPages = [];
@@ -73,11 +72,11 @@
     this.test = function() {
       return console.log("test executed");
     };
-    this.processFormEntry = function() {
-      if (this.formEntry) {
-        locationService.processLocation(this.formEntry, this.centerOfSearchArea, this.addLocation);
+    this.processLocationFormEntry = function() {
+      if (this.locationFormEntry) {
+        locationService.processLocation(this.locationFormEntry, this.centerOfSearchArea, this.addLocation);
       }
-      return this.formEntry = "";
+      return this.locationFormEntry = "";
     };
     this.locationAlreadyEntered = function(locationToCheck) {
       var location, _i, _len, _ref;
@@ -148,6 +147,7 @@
         _this.searchPages = [];
         _this.searchPageIndex = 0;
         if (!_this.searchTerm || _this.locations.length === 0) {
+          $scope.$broadcast('gmMarkersUpdate', 'meetup.getDisplayedResults()');
           return;
         }
         return locationService.performSearch(_this.centerOfSearchArea, _this.searchTerm, _this.displayResults);

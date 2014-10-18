@@ -1,4 +1,4 @@
-meetupApp = angular.module 'meetupApp', ['AngularGM','ngGPlaces']
+meetupApp = angular.module 'meetupApp', ['AngularGM','ngGPlaces','ngAutocomplete']
 
 meetupApp.factory 'locationService', ->
 	@geocoder = new google.maps.Geocoder()
@@ -9,20 +9,19 @@ meetupApp.factory 'locationService', ->
 			if status == google.maps.GeocoderStatus.OK
 				addLocation results[0]
 			else
-				alert("Failed!  Status: " + status)
+				alert("Location not found!  Please try again, or add a different location.")
 
 	@performSearch = (searchArea, searchTerm, displayResults) =>
 		@searcher.textSearch {query : searchTerm, location : searchArea, radius: 5},(results, status, pagination) ->
-			console.log("callback!");
 			if status == google.maps.places.PlacesServiceStatus.ZERO_RESULTS
-				alert 'No results!'
+				alert "No results found!  Please enter a different search term."
 				return
 			displayResults results, pagination
 
 	@getLocationDetails = (locationReferenceId, addLocationDetails) =>
 		@searcher.getDetails {placeId : locationReferenceId},(place, status) ->
 			if status != google.maps.places.PlacesServiceStatus.OK
-				alert 'Detail error!'
+				console.log "error fetching location details."
 				return
 			addLocationDetails place
 
@@ -35,7 +34,7 @@ meetupApp.controller 'MeetupController', ($scope,ngGPlacesAPI, locationService) 
 	@locations = []
 	@bounds = new google.maps.LatLngBounds()
 	@centerOfSearchArea
-	@formEntry
+	@locationFormEntry
 	@searchTerm = "coffee"
 	@markerEvents
 	@searchPages = []
@@ -45,10 +44,10 @@ meetupApp.controller 'MeetupController', ($scope,ngGPlacesAPI, locationService) 
 	@test = ->
 		console.log("test executed")
 
-	@processFormEntry = ->
-		if @formEntry
-			locationService.processLocation @formEntry, @centerOfSearchArea, @addLocation
-		@formEntry = ""
+	@processLocationFormEntry = ->
+		if @locationFormEntry
+			locationService.processLocation @locationFormEntry, @centerOfSearchArea, @addLocation
+		@locationFormEntry = ""
 
 	@locationAlreadyEntered = (locationToCheck) ->
 		for location in @locations
@@ -91,6 +90,7 @@ meetupApp.controller 'MeetupController', ($scope,ngGPlacesAPI, locationService) 
 		@searchPages = []
 		@searchPageIndex = 0
 		if !@searchTerm || @locations.length == 0
+			$scope.$broadcast('gmMarkersUpdate', 'meetup.getDisplayedResults()');
 			return
 		locationService.performSearch @centerOfSearchArea, @searchTerm, @displayResults
 

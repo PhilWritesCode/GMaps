@@ -1,48 +1,37 @@
 #map_canvas {
 	overflow: hidden;
-	position: fixed;
 	height: 100%;
-	width: 50%;
-	top: 135px;
 }
 
 #resultList {
 	overflow-x: hidden;
 	overflow-y: auto;
-	position: relative;
-    top: 105px;
 }
 
 .titleHeader {
-	position: fixed;
-	top: 0px;
-	background-color: #ffffff;
-	width: 100%;
-	z-index: 10;
+	font-family: 'Trebuchet MS', Helvetica, sans-serif;
 }
 
 .resultsLabel {
-	position: fixed;
-	top: 70px;
-	width: 100%;
-	background-color: #ffffff;
-	height: 55px;
-	z-index: 10;
+	font-family: 'Trebuchet MS', Helvetica, sans-serif;
 }
-
-.fixedForm {
-	position: fixed;
-	top: 80px;
-	width: 100%;
-	background-color: #ffffff;
-	height: 55px;
-}
-
-
 
 .locationList {
-	position: fixed;
-    top: 135px;
+
+}
+
+.instructions {
+	padding: 20px;
+}
+
+.greenArrowText {
+	color: #66bd49;
+	font-weight:bold;
+}
+
+.icon-remove-circle:hover {
+	color: #FF0000;
+	cursor: pointer;
 }
 
 .locationIdentifier {
@@ -54,7 +43,6 @@
     height: 500px;
 
 }
-
 
 .text-mode-left {
 	display: inline-block;
@@ -84,7 +72,7 @@
 
 
 .text-place, .text-place-no-filter-results {
-	margin: 4px 0 4px 2px;
+	margin: 4px 2px 4px 2px;
 	padding: 15px;
 	font-size: 13px;
 	min-height: 90px;
