@@ -228,16 +228,31 @@ meetupApp.controller 'MeetupController', ($scope, locationService) ->
 			@searchPaginationObject.nextPage()
 
 	@getPageTitle = ->
-		if window.location.host.indexOf('www.halfway') >= 0
+		if isHalfwayHangout()
 			return "HalfwayHangout"
 		else
 			return "MidwayMeetup"
 
 	@getPageSubTitle = ->
-		if window.location.host.indexOf('www.halfway') >= 0
+		if isHalfwayHangout()
 			return "Where do you want to hang out?"
 		else
 			return "Where do you want to meet up?"
+
+	@getMeetupNomenclature = ->
+		if isHalfwayHangout()
+			return "hang out"
+		else
+			return "meet up"
+
+	@getFavIcon = ->
+		if isHalfwayHangout()
+			return "img/hangout.ico"
+		else
+			return "img/meetup.ico"
+
+	isHalfwayHangout = ->
+		window.location.host.indexOf('www.halfway') >= 0
 
 	@markerSelectedIcon = {icon: 'https://maps.gstatic.com/mapfiles/ms2/micons/yellow-dot.png'}
 	@markerHighlightedIcon = {icon: 'http://labs.google.com/ridefinder/images/mm_20_yellow.png'}

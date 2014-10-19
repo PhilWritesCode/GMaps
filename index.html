@@ -8,7 +8,7 @@
         <link rel="stylesheet" type="text/css" href="css/bootstrap.min.css">
         <link rel="stylesheet" type="text/css" href="css/bootstrap-responsive.min.css">
         <link rel="stylesheet" type="text/css" href="http://netdna.bootstrapcdn.com/font-awesome/3.2.1/css/font-awesome.css" >
-
+        <link rel="shortcut icon" href="{{meetup.getFavIcon()}}">
 	</head>
 	<body ng-controller="MeetupController as meetup">
         <div class="container-fluid">
@@ -41,7 +41,10 @@
                             <p>Enter the starting location for each member of your group, one at a time, in the box above.</p>
                         </div>
                         <div ng-show="meetup.locations.length == 0" class="instructions">
-                            <p>Then, enter the type of place you'd like to meet in the search box above the map, and click Search!</p>
+                            <p>Then, enter the type of place you'd like to go ('coffee', 'bar', 'Italian food', etc.) in the search box above the map, and click Search!</p>
+                        </div>
+                        <div ng-show="meetup.locations.length == 0" class="instructions">
+                            <p>{{meetup.getPageTitle()}} will find places where all of your friends can {{meetup.getMeetupNomenclature()}}!</p>
                         </div>
                     </div>
                     <div class="span6">
@@ -94,6 +97,7 @@
                         <div ng-show="meetup.locations.length > 0" class="instructions">
                             <p>Drag the <span class="greenArrowText">green arrow</span> to refine your search area!</p>
                         </div>
+
                     </div>
                     <div class="span3">
                         <div id="results"></div>
@@ -107,7 +111,7 @@
                                  ng-mouseout="meetup.unHighlightResult(result)"
                                  ng-click="meetup.handleTextEntryClicked(result, $event)"
                                  ng-class="{selectedTextPlace:result.selected}">
-                                <div class="text-place-summary-details text-place-has-thumbnail" >
+                                <div class="text-place-summary-details text-place-has-thumbnail">
                                     <span class="text-place-title">{{result.name}}</span>
                                     <div class="text-place-summary">
                                     <span ng-show="result.rating">
@@ -177,7 +181,9 @@
                 </div>
             </div>
         </div>
-
+        <div class="finePrint">
+            &copy;2014 Phil Jenkins | Map data &copy;2014 Google | Questions/Comments: <a href="mailto:philip.t.jenkins@gmail.com">philip.t.jenkins@gmail.com</a>
+        </div>
 		<script type="text/javascript" src="lib/angular.min.js"></script>
 		<script type="text/javascript" src="src-js/meetup.min.js"></script>
         <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBxt6SwFT6CyZbFBC561_vf-CUEEq76Njk&libraries=places&sensor=false" ></script>
@@ -186,17 +192,11 @@
         <script type="text/javascript" src="lib/ngAutocomplete.js"></script>
 
         <script>
-               var analyticsID
-              if(window.location.host.indexOf('www.halfway') >= 0) {
-                    analyticsID = 'UA-55876571-1'
-              } else {
-                    analyticsID = 'UA-55679545-1'
-              }
               (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){(i[r].q=i[r].q||[]).push(arguments)},
               i[r].l=1*new Date();a=s.createElement(o),m=s.getElementsByTagName(o)[0];
               a.async=1;a.src=g;m.parentNode.insertBefore(a,m)})(window,document,'script',
               '//www.google-analytics.com/analytics.js','ga');
-              ga('create', analyticsID, 'auto');
+              ga('create', 'UA-55679545-1', 'auto');
               ga('send', 'pageview');
         </script>
 	</body>

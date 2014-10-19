@@ -1,11 +1,16 @@
 #map_canvas {
 	overflow: hidden;
-	height: 100%;
+	border: 1px solid #c6c6c6;
 }
 
 #resultList {
 	overflow-x: hidden;
 	overflow-y: auto;
+	position: absolute;
+	top: 175px;
+	bottom: 0px;
+	width: inherit;
+	margin-bottom: 20px;
 }
 
 .titleHeader {
@@ -15,6 +20,9 @@
 .resultsLabel {
 	font-family: 'Trebuchet MS', Helvetica, sans-serif;
 }
+
+
+
 
 .instructions {
 	padding: 20px 20px 0px 20px;
@@ -40,26 +48,7 @@
 
 }
 
-.text-mode-left {
-	display: inline-block;
-	float: left;
-	width: 20%;
-	min-width: 200px;
-	max-width: 600px;
-	white-space: normal;
-	min-height: 1px;
-}
-
-.text-mode-middle {
-	width: 50%;
-	display: inline-block;
-	position: relative;
-	min-width: 500px;
-	max-width: 840px;
-}
-
 .text-mode-right {
-	width: 100%;
 	display: inline-block;
 	position: relative;
 	min-width: 300px;
@@ -92,7 +81,7 @@
 	vertical-align: top;
 }
 
-.text-place-summary-details.text-place-has-thumbnail {
+.text-place-has-thumbnail {
 	margin-right: 105px;
 }
 
@@ -219,4 +208,30 @@
 .getDirectionsForm {
 	padding-top: 3px;
 	margin-bottom: 0px;
+}
+
+.finePrint {
+	position: absolute;
+	bottom: 0px;
+	font-size: 10px;
+	color: #6c6c6c;
+	right: 0px;
+	padding-right: 20px;
+}
+
+@media (max-width: 978px) {
+	#resultList {
+		overflow-x: hidden;
+		overflow-y: auto;
+		position: relative;
+		top: 0px;
+		width: 100%
+	}
+
+	.finePrint {
+    	position: relative;
+    	bottom: 0px;
+    	font-size: 10px;
+    	color: #6c6c6c;
+    }
 }

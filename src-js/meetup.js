@@ -72,6 +72,7 @@
   });
 
   meetupApp.controller('MeetupController', function($scope, locationService) {
+    var isHalfwayHangout;
     this.locationMarkers = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'];
     this.clickDisablingNodes = ['SELECT', 'A', 'INPUT'];
     this.locations = [];
@@ -317,18 +318,35 @@
       }
     };
     this.getPageTitle = function() {
-      if (window.location.host.indexOf('www.halfway') >= 0) {
+      if (isHalfwayHangout()) {
         return "HalfwayHangout";
       } else {
         return "MidwayMeetup";
       }
     };
     this.getPageSubTitle = function() {
-      if (window.location.host.indexOf('www.halfway') >= 0) {
+      if (isHalfwayHangout()) {
         return "Where do you want to hang out?";
       } else {
         return "Where do you want to meet up?";
       }
+    };
+    this.getMeetupNomenclature = function() {
+      if (isHalfwayHangout()) {
+        return "hang out";
+      } else {
+        return "meet up";
+      }
+    };
+    this.getFavIcon = function() {
+      if (isHalfwayHangout()) {
+        return "img/hangout.ico";
+      } else {
+        return "img/meetup.ico";
+      }
+    };
+    isHalfwayHangout = function() {
+      return window.location.host.indexOf('www.halfway') >= 0;
     };
     this.markerSelectedIcon = {
       icon: 'https://maps.gstatic.com/mapfiles/ms2/micons/yellow-dot.png'
