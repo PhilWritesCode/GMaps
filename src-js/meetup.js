@@ -16,8 +16,14 @@
         }, function(results, status) {
           if (status === google.maps.GeocoderStatus.OK) {
             return addLocation(results[0]);
-          } else {
+          } else if (status === google.maps.GeocoderStatus.ZERO_RESULTS) {
             return alert("Location not found!  Please try again, or add a different location.");
+          } else if (status === google.maps.GeocoderStatus.OVER_QUERY_LIMIT) {
+            return alert("Website is over query limit.  Please contact me at philip.t.jenkins@gmail.com");
+          } else if (status === google.maps.GeocoderStatus.REQUEST_DENIED) {
+            return alert("Request denied.  Please contact me at philip.t.jenkins@gmail.com");
+          } else {
+            return alert("Unknown Error.  Please check your internet connection and try again.");
           }
         });
       };
@@ -29,11 +35,19 @@
           location: searchArea,
           radius: 5
         }, function(results, status, pagination) {
-          if (status === google.maps.places.PlacesServiceStatus.ZERO_RESULTS) {
-            alert("No results found!  Please enter a different search term.");
-            return;
+          if (status === google.maps.places.PlacesServiceStatus.OK) {
+            return displayResults(results, pagination);
+          } else if (status === google.maps.places.PlacesServiceStatus.ZERO_RESULTS) {
+            return alert("No results found!  Please enter a different search term.");
+          } else if (status === google.maps.places.PlacesServiceStatus.INVALID_REQUEST) {
+            return alert("Invalid request.  Please check search term and try again.");
+          } else if (status === google.maps.places.PlacesServiceStatus.OVER_QUERY_LIMIT) {
+            return alert("Website is over query limit.  Please contact me at philip.t.jenkins@gmail.com");
+          } else if (status === google.maps.GeocoderStatus.REQUEST_DENIED) {
+            return alert("Request denied.  Please contact me at philip.t.jenkins@gmail.com");
+          } else {
+            return alert("Unknown Error.  Please check your internet connection and try again.");
           }
-          return displayResults(results, pagination);
         });
       };
     })(this);
@@ -57,7 +71,7 @@
     };
   });
 
-  meetupApp.controller('MeetupController', function($scope, ngGPlacesAPI, locationService) {
+  meetupApp.controller('MeetupController', function($scope, locationService) {
     this.locationMarkers = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'];
     this.clickDisablingNodes = ['SELECT', 'A', 'INPUT'];
     this.locations = [];
@@ -69,9 +83,6 @@
     this.searchPages = [];
     this.searchPageIndex = 0;
     this.searchPaginationObject;
-    this.test = function() {
-      return console.log("test executed");
-    };
     this.processLocationFormEntry = function() {
       if (this.locationFormEntry) {
         locationService.processLocation(this.locationFormEntry, this.centerOfSearchArea, this.addLocation);
@@ -254,16 +265,6 @@
         return this.toggleSelection(result);
       }
     };
-    this.getDirections = function(fromLocation, toLocation) {
-      var link;
-      console.log("from " + fromLocation + " to " + toLocation);
-      if (fromLocation && toLocation) {
-        link = "http://maps.google.com/maps?saddr=" + fromLocation.formatted_address + "&daddr=" + toLocation.formatted_address;
-        console.log(link);
-        window.open(link, "_blank");
-      }
-      return true;
-    };
     this.triggerOpenInfoWindow = function(result) {
       return this.markerEvents = [
         {
@@ -313,6 +314,20 @@
         return this.updateMapSearchResults();
       } else if (this.searchPaginationObject.hasNextPage) {
         return this.searchPaginationObject.nextPage();
+      }
+    };
+    this.getPageTitle = function() {
+      if (window.location.host.indexOf('www.halfway') >= 0) {
+        return "HalfwayHangout";
+      } else {
+        return "MidwayMeetup";
+      }
+    };
+    this.getPageSubTitle = function() {
+      if (window.location.host.indexOf('www.halfway') >= 0) {
+        return "Where do you want to hang out?";
+      } else {
+        return "Where do you want to meet up?";
       }
     };
     this.markerSelectedIcon = {
@@ -377,12 +392,22 @@
         return rawMinutes + "0";
       }
     };
-    return this.getAMPM = function(rawHours) {
+    this.getAMPM = function(rawHours) {
       if (rawHours < 12) {
         return "am";
       } else {
         return "pm";
       }
+    };
+    return this.getDirections = function(fromLocation, toLocation) {
+      var link;
+      console.log("from " + fromLocation + " to " + toLocation);
+      if (fromLocation && toLocation) {
+        link = "http://maps.google.com/maps?saddr=" + fromLocation.formatted_address + "&daddr=" + toLocation.formatted_address;
+        console.log(link);
+        window.open(link, "_blank");
+      }
+      return true;
     };
   });
 

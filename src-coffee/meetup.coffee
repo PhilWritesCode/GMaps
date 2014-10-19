@@ -8,15 +8,30 @@ meetupApp.factory 'locationService', ->
 		@geocoder.geocode {address: newLocation, location: centerOfSearchArea}, (results, status) ->
 			if status == google.maps.GeocoderStatus.OK
 				addLocation results[0]
+			else if status == google.maps.GeocoderStatus.ZERO_RESULTS
+				alert "Location not found!  Please try again, or add a different location."
+			else if status == google.maps.GeocoderStatus.OVER_QUERY_LIMIT
+				alert "Website is over query limit.  Please contact me at philip.t.jenkins@gmail.com"
+			else if status == google.maps.GeocoderStatus.REQUEST_DENIED
+				alert "Request denied.  Please contact me at philip.t.jenkins@gmail.com"
 			else
-				alert("Location not found!  Please try again, or add a different location.")
+				alert "Unknown Error.  Please check your internet connection and try again."
 
 	@performSearch = (searchArea, searchTerm, displayResults) =>
 		@searcher.textSearch {query : searchTerm, location : searchArea, radius: 5},(results, status, pagination) ->
-			if status == google.maps.places.PlacesServiceStatus.ZERO_RESULTS
+			if status == google.maps.places.PlacesServiceStatus.OK
+				displayResults results, pagination
+			else if status == google.maps.places.PlacesServiceStatus.ZERO_RESULTS
 				alert "No results found!  Please enter a different search term."
-				return
-			displayResults results, pagination
+			else if status == google.maps.places.PlacesServiceStatus.INVALID_REQUEST
+				alert "Invalid request.  Please check search term and try again."
+			else if status == google.maps.places.PlacesServiceStatus.OVER_QUERY_LIMIT
+				alert "Website is over query limit.  Please contact me at philip.t.jenkins@gmail.com"
+			else if status == google.maps.GeocoderStatus.REQUEST_DENIED
+				alert "Request denied.  Please contact me at philip.t.jenkins@gmail.com"
+			else
+				alert "Unknown Error.  Please check your internet connection and try again."
+
 
 	@getLocationDetails = (locationReferenceId, addLocationDetails) =>
 		@searcher.getDetails {placeId : locationReferenceId},(place, status) ->
@@ -28,7 +43,7 @@ meetupApp.factory 'locationService', ->
 	{@processLocation, @performSearch, @getLocationDetails}
 
 
-meetupApp.controller 'MeetupController', ($scope,ngGPlacesAPI, locationService) ->
+meetupApp.controller 'MeetupController', ($scope, locationService) ->
 	@locationMarkers = ['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z']
 	@clickDisablingNodes = ['SELECT', 'A', 'INPUT']
 	@locations = []
@@ -40,9 +55,6 @@ meetupApp.controller 'MeetupController', ($scope,ngGPlacesAPI, locationService) 
 	@searchPages = []
 	@searchPageIndex = 0
 	@searchPaginationObject
-
-	@test = ->
-		console.log("test executed")
 
 	@processLocationFormEntry = ->
 		if @locationFormEntry
@@ -180,14 +192,6 @@ meetupApp.controller 'MeetupController', ($scope,ngGPlacesAPI, locationService) 
 		else
 			@toggleSelection(result)
 
-	@getDirections = (fromLocation, toLocation) ->
-		console.log("from " + fromLocation + " to " + toLocation)
-		if fromLocation && toLocation
-			link = "http://maps.google.com/maps?saddr=" + fromLocation.formatted_address + "&daddr=" +  toLocation.formatted_address
-			console.log(link)
-			window.open(link, "_blank");
-		return true
-
 	@triggerOpenInfoWindow = (result) ->
     		@markerEvents = [{event: 'openinfowindow',ids: ['result' + result.formatted_address]}];
 
@@ -222,6 +226,18 @@ meetupApp.controller 'MeetupController', ($scope,ngGPlacesAPI, locationService) 
 			@updateMapSearchResults()
 		else if @searchPaginationObject.hasNextPage
 			@searchPaginationObject.nextPage()
+
+	@getPageTitle = ->
+		if window.location.host.indexOf('www.halfway') >= 0
+			return "HalfwayHangout"
+		else
+			return "MidwayMeetup"
+
+	@getPageSubTitle = ->
+		if window.location.host.indexOf('www.halfway') >= 0
+			return "Where do you want to hang out?"
+		else
+			return "Where do you want to meet up?"
 
 	@markerSelectedIcon = {icon: 'https://maps.gstatic.com/mapfiles/ms2/micons/yellow-dot.png'}
 	@markerHighlightedIcon = {icon: 'http://labs.google.com/ridefinder/images/mm_20_yellow.png'}
@@ -263,3 +279,11 @@ meetupApp.controller 'ResultListController', ($scope) ->
 			return "am"
 		else
 			return "pm"
+
+	@getDirections = (fromLocation, toLocation) ->
+		console.log("from " + fromLocation + " to " + toLocation)
+		if fromLocation && toLocation
+			link = "http://maps.google.com/maps?saddr=" + fromLocation.formatted_address + "&daddr=" +  toLocation.formatted_address
+			console.log(link)
+			window.open(link, "_blank");
+		return true
