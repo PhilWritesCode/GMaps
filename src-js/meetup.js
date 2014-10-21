@@ -29,7 +29,7 @@
       };
     })(this);
     this.performSearch = (function(_this) {
-      return function(searchArea, searchTerm, displayResults) {
+      return function(searchArea, searchTerm, displayResults, onError) {
         return _this.searcher.textSearch({
           query: searchTerm,
           location: searchArea,
@@ -38,15 +38,20 @@
           if (status === google.maps.places.PlacesServiceStatus.OK) {
             return displayResults(results, pagination);
           } else if (status === google.maps.places.PlacesServiceStatus.ZERO_RESULTS) {
-            return alert("No results found!  Please enter a different search term.");
+            alert("No results found!  Please enter a different search term.");
+            return onError();
           } else if (status === google.maps.places.PlacesServiceStatus.INVALID_REQUEST) {
-            return alert("Invalid request.  Please check search term and try again.");
+            alert("Invalid request.  Please check search term and try again.");
+            return onError();
           } else if (status === google.maps.places.PlacesServiceStatus.OVER_QUERY_LIMIT) {
-            return alert("Website is over query limit.  Please contact me at philip.t.jenkins@gmail.com");
+            alert("Website is over query limit.  Please contact me at philip.t.jenkins@gmail.com");
+            return onError();
           } else if (status === google.maps.GeocoderStatus.REQUEST_DENIED) {
-            return alert("Request denied.  Please contact me at philip.t.jenkins@gmail.com");
+            alert("Request denied.  Please contact me at philip.t.jenkins@gmail.com");
+            return onError();
           } else {
-            return alert("Unknown Error.  Please check your internet connection and try again.");
+            alert("Unknown Error.  Please check your internet connection and try again.");
+            return onError();
           }
         });
       };
@@ -71,8 +76,8 @@
     };
   });
 
-  meetupApp.controller('MeetupController', function($scope, locationService) {
-    var isHalfwayHangout;
+  meetupApp.controller('MeetupController', function($scope, $location, $anchorScroll, locationService) {
+    var isHalfwayHangout, updateResultsMarkers;
     this.locationMarkers = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'];
     this.clickDisablingNodes = ['SELECT', 'A', 'INPUT'];
     this.locations = [];
@@ -159,10 +164,10 @@
         _this.searchPages = [];
         _this.searchPageIndex = 0;
         if (!_this.searchTerm || _this.locations.length === 0) {
-          $scope.$broadcast('gmMarkersUpdate', 'meetup.getDisplayedResults()');
+          updateResultsMarkers();
           return;
         }
-        return locationService.performSearch(_this.centerOfSearchArea, _this.searchTerm, _this.displayResults);
+        return locationService.performSearch(_this.centerOfSearchArea, _this.searchTerm, _this.displayResults, updateResultsMarkers);
       };
     })(this);
     this.displayResults = (function(_this) {
@@ -175,6 +180,11 @@
         }
         _this.updateMapSearchResults();
         return $scope.$apply();
+      };
+    })(this);
+    updateResultsMarkers = (function(_this) {
+      return function() {
+        return $scope.$broadcast('gmMarkersUpdate', 'meetup.getDisplayedResults()');
       };
     })(this);
     this.getDisplayedResults = function() {
@@ -196,24 +206,9 @@
           }
         }
         $scope.$apply();
-        return $scope.$broadcast('gmMarkersUpdate', 'meetup.getDisplayedResults()');
+        return updateResultsMarkers();
       };
     })(this);
-    this.getMapLocationOptions = function(result) {
-      return angular.extend(this.mapLocationOptions, {
-        icon: "http://maps.google.com/mapfiles/marker_grey" + this.locationMarkers[this.locations.indexOf(result)] + ".png"
-      });
-    };
-    this.getMapSearchAreaOptions = function() {
-      if (this.locations.length > 0) {
-        return this.mapSearchAreaOptions;
-      } else {
-        return this.mapHiddenMarkersOptions;
-      }
-    };
-    this.getMapSearchResultsOptions = function(result) {
-      return angular.extend(this.searchResultOptions, result.selected ? this.markerSelectedIcon : result.highlighted ? this.markerHighlightedIcon : this.markerDefaultIcon);
-    };
     this.getLocationId = function(location) {
       return this.locationMarkers[this.locations.indexOf(location)];
     };
@@ -235,19 +230,19 @@
         result.selected = false;
       }
       thisResult.selected = true;
-      return $scope.$broadcast('gmMarkersUpdate', 'meetup.getDisplayedResults()');
+      return updateResultsMarkers();
     };
     this.deSelectResult = function(thisResult) {
       thisResult.selected = false;
-      return $scope.$broadcast('gmMarkersUpdate', 'meetup.getDisplayedResults()');
+      return updateResultsMarkers();
     };
     this.highlightResult = function(result) {
       result.highlighted = true;
-      return $scope.$broadcast('gmMarkersUpdate', 'meetup.getDisplayedResults()');
+      return updateResultsMarkers();
     };
     this.unHighlightResult = function(result) {
       result.highlighted = false;
-      return $scope.$broadcast('gmMarkersUpdate', 'meetup.getDisplayedResults()');
+      return updateResultsMarkers();
     };
     this.toggleSelection = function(result) {
       if (result.selected) {
@@ -347,6 +342,33 @@
     };
     isHalfwayHangout = function() {
       return window.location.host.indexOf('halfwayhangout.com') >= 0;
+    };
+    this.getLocationPlaceholder = function() {
+      if (this.locations.length > 0) {
+        return "Enter another address...";
+      } else {
+        return "Enter a starting address";
+      }
+    };
+    this.scrollToResults = function() {
+      console.log('jump');
+      $location.hash('results');
+      return $anchorScroll();
+    };
+    this.getMapLocationOptions = function(result) {
+      return angular.extend(this.mapLocationOptions, {
+        icon: "http://maps.google.com/mapfiles/marker_grey" + this.locationMarkers[this.locations.indexOf(result)] + ".png"
+      });
+    };
+    this.getMapSearchAreaOptions = function() {
+      if (this.locations.length > 0) {
+        return this.mapSearchAreaOptions;
+      } else {
+        return this.mapHiddenMarkersOptions;
+      }
+    };
+    this.getMapSearchResultsOptions = function(result) {
+      return angular.extend(this.searchResultOptions, result.selected ? this.markerSelectedIcon : result.highlighted ? this.markerHighlightedIcon : this.markerDefaultIcon);
     };
     this.markerSelectedIcon = {
       icon: 'https://maps.gstatic.com/mapfiles/ms2/micons/yellow-dot.png'

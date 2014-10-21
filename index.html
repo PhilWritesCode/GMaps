@@ -4,9 +4,10 @@
 		<title>{{meetup.getPageTitle()}} | {{meetup.getPageSubTitle()}}</title>
         <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
 
-		<link rel="stylesheet" type="text/css" href="css/meetup.css">
+
         <link rel="stylesheet" type="text/css" href="css/bootstrap.min.css">
         <link rel="stylesheet" type="text/css" href="css/bootstrap-responsive.min.css">
+        <link rel="stylesheet" type="text/css" href="css/meetup.css">
         <link rel="stylesheet" type="text/css" href="http://netdna.bootstrapcdn.com/font-awesome/3.2.1/css/font-awesome.css" >
         <link rel="shortcut icon" href="{{meetup.getFavIcon()}}">
 	</head>
@@ -21,22 +22,25 @@
                 <div class="span12">
                     <div class="span3">
                         <label class="label label-info" style="padding-right: 5px">Where is everyone?</label>
-                        <form name="locationEntryForm" ng-submit="meetup.processLocationFormEntry()" class="form-inline">
-                            <div class="input-append">
-                                <input type="text" id="locationInput"
-                                       autofocus="true"
-                                       class="input-large"
-                                       placeholder="Enter an address"
-                                       title="Enter addresses here!"
-                                       ng-model="meetup.locationFormEntry"/>
-                                <input type="submit" class="btn btn-primary" value="Add" />
-                            </div>
-                        </form>
-                        <ul class="unstyled locationList">
+                        <ul class="unstyled locationList" ng-show="meetup.locations.length > 0">
                             <li ng-repeat="location in meetup.locations">
                                 <i class="icon-remove-circle deleteIcon" title="click to remove location" ng-click="meetup.removeLocation(location)"></i> <span class="badge">{{meetup.getLocationId(location)}}</span>  {{meetup.getNormalizedAddress(location)}}
                             </li>
                         </ul>
+                        <form name="locationEntryForm" ng-submit="meetup.processLocationFormEntry()" class="form-inline">
+                            <div class="input-append" >
+                                <input type="text" id="locationInput"
+                                       autofocus="true"
+                                       ng-class="{subtleInput:meetup.locations.length > 0}"
+                                       class="input-large"
+                                       placeholder="{{meetup.getLocationPlaceholder()}}"
+                                       title="Enter addresses here!"
+                                       ng-model="meetup.locationFormEntry"/>
+                                <input type="submit"
+                                       class="btn btn-primary"
+                                       value="Add" />
+                            </div>
+                        </form>
                         <div ng-show="meetup.locations.length == 0" class="instructions">
                             <p>Enter the starting location for each member of your group, one at a time, in the box above.</p>
                         </div>
@@ -51,8 +55,11 @@
                         <label class="label label-info" style="padding-right: 5px">What do you want to do?</label>
                         <form name="searchForm" ng-submit="meetup.performSearch()" class="form-inline">
                             <div class="input-append">
-                                <input type="text" id="searchInput" class="input-large" placeholder="'coffee', 'bars', 'Italian food'" title="Enter a meetup spot!  For example: 'coffee'" ng-model="meetup.searchTerm" />
+                                <input type="text" id="searchInput" class="input-large" placeholder="'coffee', 'bar', 'Italian food'" title="Enter a meetup spot!  For example: 'coffee'" ng-model="meetup.searchTerm" />
                                 <input type="submit" class="btn btn-primary" value="Search!" />
+                            </div>
+                            <div class="jumpToResultsLink" ng-show="meetup.getDisplayedResults().length > 0">
+                                <a ng-click="meetup.scrollToResults()">&#x25BC; Results</a>
                             </div>
                         </form>
                         <div id="map_canvas">
@@ -185,7 +192,7 @@
             &copy;2014 Phil Jenkins | Map data &copy;2014 Google | Questions/Comments: <a href="mailto:philip.t.jenkins@gmail.com">philip.t.jenkins@gmail.com</a> | <a target="_blank" href="https://www.surveymonkey.com/s/8MBFK5J">User Survey</a>
         </div>
 		<script type="text/javascript" src="lib/angular.min.js"></script>
-		<script type="text/javascript" src="src-js/meetup.js"></script>
+		<script type="text/javascript" src="src-js/meetup.min.js"></script>
         <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBxt6SwFT6CyZbFBC561_vf-CUEEq76Njk&libraries=places&sensor=false" ></script>
         <script type="text/javascript" src="lib/angular-gm.min.js"></script>
         <script type="text/javascript" src="lib/angularjs-google-places.min.js"></script>

@@ -17,20 +17,25 @@ meetupApp.factory 'locationService', ->
 			else
 				alert "Unknown Error.  Please check your internet connection and try again."
 
-	@performSearch = (searchArea, searchTerm, displayResults) =>
+	@performSearch = (searchArea, searchTerm, displayResults, onError) =>
 		@searcher.textSearch {query : searchTerm, location : searchArea, radius: 5},(results, status, pagination) ->
 			if status == google.maps.places.PlacesServiceStatus.OK
 				displayResults results, pagination
 			else if status == google.maps.places.PlacesServiceStatus.ZERO_RESULTS
 				alert "No results found!  Please enter a different search term."
+				onError()
 			else if status == google.maps.places.PlacesServiceStatus.INVALID_REQUEST
 				alert "Invalid request.  Please check search term and try again."
+				onError()
 			else if status == google.maps.places.PlacesServiceStatus.OVER_QUERY_LIMIT
 				alert "Website is over query limit.  Please contact me at philip.t.jenkins@gmail.com"
+				onError()
 			else if status == google.maps.GeocoderStatus.REQUEST_DENIED
 				alert "Request denied.  Please contact me at philip.t.jenkins@gmail.com"
+				onError()
 			else
 				alert "Unknown Error.  Please check your internet connection and try again."
+				onError()
 
 
 	@getLocationDetails = (locationReferenceId, addLocationDetails) =>
@@ -43,7 +48,7 @@ meetupApp.factory 'locationService', ->
 	{@processLocation, @performSearch, @getLocationDetails}
 
 
-meetupApp.controller 'MeetupController', ($scope, locationService) ->
+meetupApp.controller 'MeetupController', ($scope, $location, $anchorScroll, locationService) ->
 	@locationMarkers = ['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z']
 	@clickDisablingNodes = ['SELECT', 'A', 'INPUT']
 	@locations = []
@@ -102,9 +107,9 @@ meetupApp.controller 'MeetupController', ($scope, locationService) ->
 		@searchPages = []
 		@searchPageIndex = 0
 		if !@searchTerm || @locations.length == 0
-			$scope.$broadcast('gmMarkersUpdate', 'meetup.getDisplayedResults()');
+			updateResultsMarkers()
 			return
-		locationService.performSearch @centerOfSearchArea, @searchTerm, @displayResults
+		locationService.performSearch @centerOfSearchArea, @searchTerm, @displayResults, updateResultsMarkers
 
 	@displayResults = (results, pagination) =>
 		@searchPaginationObject = pagination
@@ -114,6 +119,9 @@ meetupApp.controller 'MeetupController', ($scope, locationService) ->
 			@searchPageIndex++
 		@updateMapSearchResults()
 		$scope.$apply()
+
+	updateResultsMarkers = =>
+		$scope.$broadcast('gmMarkersUpdate', 'meetup.getDisplayedResults()');
 
 	@getDisplayedResults = ->
 		return @searchPages[@searchPageIndex]
@@ -128,28 +136,7 @@ meetupApp.controller 'MeetupController', ($scope, locationService) ->
 				result.opening_hours = place.opening_hours
 				break;
 		$scope.$apply()
-		$scope.$broadcast('gmMarkersUpdate', 'meetup.getDisplayedResults()');
-
-	@getMapLocationOptions = (result) ->
-		angular.extend( @mapLocationOptions,
-			{icon: "http://maps.google.com/mapfiles/marker_grey" + @locationMarkers[@locations.indexOf(result)] + ".png"}
-		)
-
-	@getMapSearchAreaOptions = ->
-		if @locations.length > 0
-			return @mapSearchAreaOptions
-		else
-			return @mapHiddenMarkersOptions
-
-	@getMapSearchResultsOptions = (result) ->
-		angular.extend( @searchResultOptions,
-			if result.selected
-				@markerSelectedIcon
-			else if result.highlighted
-				@markerHighlightedIcon
-			else
-				@markerDefaultIcon
-		)
+		updateResultsMarkers()
 
 	@getLocationId = (location) ->
 		@locationMarkers[@locations.indexOf location]
@@ -165,19 +152,19 @@ meetupApp.controller 'MeetupController', ($scope, locationService) ->
 		for result in @getDisplayedResults()
 			result.selected = false
 		thisResult.selected = true
-		$scope.$broadcast('gmMarkersUpdate', 'meetup.getDisplayedResults()');
+		updateResultsMarkers()
 
 	@deSelectResult = (thisResult) ->
 		thisResult.selected = false
-		$scope.$broadcast('gmMarkersUpdate', 'meetup.getDisplayedResults()');
+		updateResultsMarkers()
 
 	@highlightResult = (result) ->
-    		result.highlighted = true
-    		$scope.$broadcast('gmMarkersUpdate', 'meetup.getDisplayedResults()');
+		result.highlighted = true
+		updateResultsMarkers()
 
 	@unHighlightResult = (result) ->
-    		result.highlighted = false
-    		$scope.$broadcast('gmMarkersUpdate', 'meetup.getDisplayedResults()');
+		result.highlighted = false
+		updateResultsMarkers()
 
 	@toggleSelection = (result) ->
 		if result.selected
@@ -254,6 +241,38 @@ meetupApp.controller 'MeetupController', ($scope, locationService) ->
 	isHalfwayHangout = ->
 		window.location.host.indexOf('halfwayhangout.com') >= 0
 
+	@getLocationPlaceholder = ->
+		if @locations.length > 0
+			return "Enter another address..."
+		else
+			return "Enter a starting address"
+
+	@scrollToResults = ->
+		console.log 'jump'
+		$location.hash 'results'
+		$anchorScroll()
+
+	@getMapLocationOptions = (result) ->
+		angular.extend( @mapLocationOptions,
+			{icon: "http://maps.google.com/mapfiles/marker_grey" + @locationMarkers[@locations.indexOf(result)] + ".png"}
+		)
+
+	@getMapSearchAreaOptions = ->
+		if @locations.length > 0
+			return @mapSearchAreaOptions
+		else
+			return @mapHiddenMarkersOptions
+
+	@getMapSearchResultsOptions = (result) ->
+		angular.extend( @searchResultOptions,
+			if result.selected
+				@markerSelectedIcon
+			else if result.highlighted
+				@markerHighlightedIcon
+			else
+				@markerDefaultIcon
+		)
+
 	@markerSelectedIcon = {icon: 'https://maps.gstatic.com/mapfiles/ms2/micons/yellow-dot.png'}
 	@markerHighlightedIcon = {icon: 'http://labs.google.com/ridefinder/images/mm_20_yellow.png'}
 	@markerDefaultIcon = {icon: 'http://labs.google.com/ridefinder/images/mm_20_purple.png'}
@@ -302,3 +321,4 @@ meetupApp.controller 'ResultListController', ($scope) ->
 			console.log(link)
 			window.open(link, "_blank");
 		return true
+
