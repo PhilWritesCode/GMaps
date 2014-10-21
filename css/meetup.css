@@ -1,6 +1,7 @@
 #map_canvas {
 	overflow: hidden;
 	border: 1px solid #c6c6c6;
+	margin-bottom: 5px;
 }
 
 #resultList {
@@ -25,7 +26,7 @@
 
 
 .instructions {
-	padding: 20px 20px 0px 20px;
+	padding: 0px 20px 20px 20px;
 }
 
 .greenArrowText {
