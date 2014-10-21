@@ -27,6 +27,10 @@ a {
 	font-family: 'Trebuchet MS', Helvetica, sans-serif;
 }
 
+.resultsHeader {
+	display: inline-block !important;
+}
+
 .subtleInput {
 	border: 1px dotted #999 !important;
 }
@@ -230,8 +234,13 @@ a {
 	padding-right: 20px;
 }
 
-.jumpToResultsLink {
+.jumpToLink {
 	display: none;
+}
+
+.jumpToTopLink {
+	font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
+	float: right;
 }
 
 
@@ -251,7 +260,7 @@ a {
     	color: #6c6c6c;
     }
 
-    .jumpToResultsLink {
+    .jumpToLink {
     	display: inline-block;
     	margin-left: 5px;
     	margin-top: 5px;

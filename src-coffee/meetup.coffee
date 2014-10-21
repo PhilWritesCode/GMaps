@@ -247,9 +247,8 @@ meetupApp.controller 'MeetupController', ($scope, $location, $anchorScroll, loca
 		else
 			return "Enter a starting address"
 
-	@scrollToResults = ->
-		console.log 'jump'
-		$location.hash 'results'
+	@scrollTo = (anchorTagId) ->
+		$location.hash anchorTagId
 		$anchorScroll()
 
 	@getMapLocationOptions = (result) ->

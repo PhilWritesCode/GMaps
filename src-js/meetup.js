@@ -350,9 +350,8 @@
         return "Enter a starting address";
       }
     };
-    this.scrollToResults = function() {
-      console.log('jump');
-      $location.hash('results');
+    this.scrollTo = function(anchorTagId) {
+      $location.hash(anchorTagId);
       return $anchorScroll();
     };
     this.getMapLocationOptions = function(result) {

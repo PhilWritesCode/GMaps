@@ -14,7 +14,7 @@
 	<body ng-controller="MeetupController as meetup">
         <div class="container-fluid">
             <div class="row-fluid">
-                <div class="span12 titleHeader page-header" >
+                <div id="header" class="span12 titleHeader page-header" >
                     <h1 class="titleHeader">{{meetup.getPageTitle()}} <small>{{meetup.getPageSubTitle()}}</small></h1>
                 </div>
             </div>
@@ -45,7 +45,7 @@
                             <p>Enter the starting location for each member of your group, one at a time, in the box above.</p>
                         </div>
                         <div ng-show="meetup.locations.length == 0" class="instructions">
-                            <p>Then, enter the type of place you'd like to go ('coffee', 'movie theater', 'Italian food', etc.) in the search box above the map, and click Search!</p>
+                            <p>Then, enter the type of place you'd like to go ('coffee', 'movie theater', 'Italian food', etc.) in the search box above the map, and click Go!</p>
                         </div>
                         <div ng-show="meetup.locations.length == 0" class="instructions">
                             <p>{{meetup.getPageTitle()}} will find places where all of your friends can {{meetup.getMeetupNomenclature()}}!</p>
@@ -56,10 +56,10 @@
                         <form name="searchForm" ng-submit="meetup.performSearch()" class="form-inline">
                             <div class="input-append">
                                 <input type="text" id="searchInput" class="input-large" placeholder="'coffee', 'bar', 'Italian food'" title="Enter a meetup spot!  For example: 'coffee'" ng-model="meetup.searchTerm" />
-                                <input type="submit" class="btn btn-primary" value="Search!" />
+                                <input type="submit" class="btn btn-primary" value="Go!" />
                             </div>
-                            <div class="jumpToResultsLink" ng-show="meetup.getDisplayedResults().length > 0">
-                                <a ng-click="meetup.scrollToResults()">&#x25BC; Results</a>
+                            <div class="jumpToLink" ng-show="meetup.getDisplayedResults().length > 0">
+                                <a ng-click="meetup.scrollTo('results')">&#x25BC;Jump to Results</a>
                             </div>
                         </form>
                         <div id="map_canvas">
@@ -101,16 +101,21 @@
                                 </gm-markers>
                             </gm-map>
                         </div>
-                        <div ng-show="meetup.locations.length > 0" class="instructions">
+                        <div ng-show="meetup.locations.length > 0" class="">
                             <p>Drag the <span class="greenArrowText">green arrow</span> to refine your search area!</p>
                         </div>
 
                     </div>
                     <div class="span3">
                         <div id="results"></div>
+
                         <div ng-show="meetup.getDisplayedResults().length > 0" class="resultsLabel">
-                            <h2>Results</h2>
+                            <h2 class="resultsHeader">Results</h2>
+                            <div class="jumpToLink" ng-show="meetup.getDisplayedResults().length > 0">
+                                <a class="jumpToTopLink" ng-click="meetup.scrollTo('header')">&#x25B2;Jump to Top</a>
+                            </div>
                         </div>
+
                         <div id="resultList" ng-controller="ResultListController as resultCtrl" ng-show="meetup.getDisplayedResults()" class="text-mode-right">
                             <div ng-repeat="result in meetup.getDisplayedResults()" class="text-place"
                                  scroll-if="result.selected"
