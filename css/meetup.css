@@ -211,7 +211,7 @@
 }
 
 .finePrint {
-	position: absolute;
+	position: fixed;
 	bottom: 0px;
 	font-size: 10px;
 	color: #6c6c6c;

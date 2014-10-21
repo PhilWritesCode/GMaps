@@ -252,7 +252,7 @@ meetupApp.controller 'MeetupController', ($scope, locationService) ->
 			return "img/meetup.ico"
 
 	isHalfwayHangout = ->
-		window.location.host.indexOf('www.halfway') >= 0
+		window.location.host.indexOf('halfwayhangout.com') >= 0
 
 	@markerSelectedIcon = {icon: 'https://maps.gstatic.com/mapfiles/ms2/micons/yellow-dot.png'}
 	@markerHighlightedIcon = {icon: 'http://labs.google.com/ridefinder/images/mm_20_yellow.png'}

@@ -28,11 +28,11 @@
     <splitter split-orientation="horizontal" split-proportion="0.44227245">
       <split-first>
         <leaf>
-          <file leaf-file-name="meetup.coffee" pinned="false" current="false" current-in-tab="false">
+          <file leaf-file-name="meetup.coffee" pinned="false" current="false" current-in-tab="true">
             <entry file="file://$PROJECT_DIR$/src-coffee/meetup.coffee">
               <provider selected="true" editor-type-id="text-editor">
-                <state vertical-scroll-proportion="-20.785715" vertical-offset="3736" max-vertical-offset="5270">
-                  <caret line="254" column="49" selection-start-line="254" selection-start-column="49" selection-end-line="254" selection-end-column="49" />
+                <state vertical-scroll-proportion="0.3634232" vertical-offset="3940" max-vertical-offset="5270">
+                  <caret line="250" column="12" selection-start-line="250" selection-start-column="12" selection-end-line="250" selection-end-column="12" />
                   <folding />
                 </state>
               </provider>
@@ -41,17 +41,17 @@
           <file leaf-file-name="meetup.js" pinned="false" current="false" current-in-tab="false">
             <entry file="file://$PROJECT_DIR$/src-js/meetup.js">
               <provider selected="true" editor-type-id="text-editor">
-                <state vertical-scroll-proportion="0.0" vertical-offset="5273" max-vertical-offset="7446">
+                <state vertical-scroll-proportion="0.0" vertical-offset="5681" max-vertical-offset="7446">
                   <caret line="432" column="0" selection-start-line="432" selection-start-column="0" selection-end-line="432" selection-end-column="0" />
                   <folding />
                 </state>
               </provider>
             </entry>
           </file>
-          <file leaf-file-name="meetup.min.js" pinned="false" current="false" current-in-tab="true">
+          <file leaf-file-name="meetup.min.js" pinned="false" current="false" current-in-tab="false">
             <entry file="file://$PROJECT_DIR$/src-js/meetup.min.js">
               <provider selected="true" editor-type-id="text-editor">
-                <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="881">
+                <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="102">
                   <caret line="0" column="10033" selection-start-line="0" selection-start-column="10033" selection-end-line="0" selection-end-column="10033" />
                   <folding />
                 </state>
@@ -62,11 +62,11 @@
       </split-first>
       <split-second>
         <leaf>
-          <file leaf-file-name="index.html" pinned="false" current="true" current-in-tab="true">
+          <file leaf-file-name="index.html" pinned="false" current="false" current-in-tab="false">
             <entry file="file://$PROJECT_DIR$/index.html">
               <provider selected="true" editor-type-id="text-editor">
-                <state vertical-scroll-proportion="0.5888755" vertical-offset="1485" max-vertical-offset="2312">
-                  <caret line="188" column="56" selection-start-line="188" selection-start-column="56" selection-end-line="188" selection-end-column="56" />
+                <state vertical-scroll-proportion="-11.851851" vertical-offset="1434" max-vertical-offset="2312">
+                  <caret line="194" column="103" selection-start-line="188" selection-start-column="104" selection-end-line="194" selection-end-column="103" />
                   <folding>
                     <element signature="n#style#0;n#label#0;n#div#0;n#div#0;n#div#1;n#div#0;n#body#0;n#html#0;n#!!top" expanded="true" />
                     <element signature="n#style#0;n#label#0;n#div#1;n#div#0;n#div#1;n#div#0;n#body#0;n#html#0;n#!!top" expanded="true" />
@@ -76,11 +76,11 @@
               </provider>
             </entry>
           </file>
-          <file leaf-file-name="meetup.css" pinned="false" current="false" current-in-tab="false">
+          <file leaf-file-name="meetup.css" pinned="false" current="true" current-in-tab="true">
             <entry file="file://$PROJECT_DIR$/css/meetup.css">
               <provider selected="true" editor-type-id="text-editor">
-                <state vertical-scroll-proportion="-7.285714" vertical-offset="0" max-vertical-offset="4114">
-                  <caret line="12" column="10" selection-start-line="12" selection-start-column="10" selection-end-line="12" selection-end-column="10" />
+                <state vertical-scroll-proportion="0.43071595" vertical-offset="3248" max-vertical-offset="4114">
+                  <caret line="213" column="19" selection-start-line="213" selection-start-column="19" selection-end-line="213" selection-end-column="19" />
                   <folding />
                 </state>
               </provider>
@@ -99,10 +99,10 @@
     <option name="changedFiles">
       <list>
         <option value="$PROJECT_DIR$/src-js/meetup.js" />
-        <option value="$PROJECT_DIR$/css/meetup.css" />
-        <option value="$PROJECT_DIR$/src-coffee/meetup.coffee" />
         <option value="$PROJECT_DIR$/src-js/meetup.min.js" />
+        <option value="$PROJECT_DIR$/src-coffee/meetup.coffee" />
         <option value="$PROJECT_DIR$/index.html" />
+        <option value="$PROJECT_DIR$/css/meetup.css" />
       </list>
     </option>
   </component>
@@ -680,18 +680,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/css/meetup.css">
+    <entry file="file://$PROJECT_DIR$/src-js/meetup.min.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="-7.285714" vertical-offset="0" max-vertical-offset="4114">
-          <caret line="12" column="10" selection-start-line="12" selection-start-column="10" selection-end-line="12" selection-end-column="10" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src-coffee/meetup.coffee">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="-20.785715" vertical-offset="3736" max-vertical-offset="5270">
-          <caret line="254" column="49" selection-start-line="254" selection-start-column="49" selection-end-line="254" selection-end-column="49" />
+        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="881">
+          <caret line="0" column="10033" selection-start-line="0" selection-start-column="10033" selection-end-line="0" selection-end-column="10033" />
           <folding />
         </state>
       </provider>
@@ -704,23 +696,31 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src-js/meetup.min.js">
+    <entry file="file://$PROJECT_DIR$/src-coffee/meetup.coffee">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="881">
-          <caret line="0" column="10033" selection-start-line="0" selection-start-column="10033" selection-end-line="0" selection-end-column="10033" />
+        <state vertical-scroll-proportion="0.3634232" vertical-offset="3940" max-vertical-offset="5270">
+          <caret line="250" column="12" selection-start-line="250" selection-start-column="12" selection-end-line="250" selection-end-column="12" />
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/index.html">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.5888755" vertical-offset="1485" max-vertical-offset="2312">
-          <caret line="188" column="56" selection-start-line="188" selection-start-column="56" selection-end-line="188" selection-end-column="56" />
+        <state vertical-scroll-proportion="-11.851851" vertical-offset="1434" max-vertical-offset="2312">
+          <caret line="194" column="103" selection-start-line="188" selection-start-column="104" selection-end-line="194" selection-end-column="103" />
           <folding>
             <element signature="n#style#0;n#label#0;n#div#0;n#div#0;n#div#1;n#div#0;n#body#0;n#html#0;n#!!top" expanded="true" />
             <element signature="n#style#0;n#label#0;n#div#1;n#div#0;n#div#1;n#div#0;n#body#0;n#html#0;n#!!top" expanded="true" />
             <element signature="tag#div#2;tag#div#2;tag#div#0;tag#div#1;tag#div#0;tag#body#0;tag#html#0" expanded="false" />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/css/meetup.css">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.43071595" vertical-offset="3248" max-vertical-offset="4114">
+          <caret line="213" column="19" selection-start-line="213" selection-start-column="19" selection-end-line="213" selection-end-column="19" />
+          <folding />
         </state>
       </provider>
     </entry>

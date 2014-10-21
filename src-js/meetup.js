@@ -346,7 +346,7 @@
       }
     };
     isHalfwayHangout = function() {
-      return window.location.host.indexOf('www.halfway') >= 0;
+      return window.location.host.indexOf('halfwayhangout.com') >= 0;
     };
     this.markerSelectedIcon = {
       icon: 'https://maps.gstatic.com/mapfiles/ms2/micons/yellow-dot.png'

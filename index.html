@@ -41,7 +41,7 @@
                             <p>Enter the starting location for each member of your group, one at a time, in the box above.</p>
                         </div>
                         <div ng-show="meetup.locations.length == 0" class="instructions">
-                            <p>Then, enter the type of place you'd like to go ('coffee', 'bar', 'Italian food', etc.) in the search box above the map, and click Search!</p>
+                            <p>Then, enter the type of place you'd like to go ('coffee', 'movie theater', 'Italian food', etc.) in the search box above the map, and click Search!</p>
                         </div>
                         <div ng-show="meetup.locations.length == 0" class="instructions">
                             <p>{{meetup.getPageTitle()}} will find places where all of your friends can {{meetup.getMeetupNomenclature()}}!</p>
@@ -185,7 +185,7 @@
             &copy;2014 Phil Jenkins | Map data &copy;2014 Google | Questions/Comments: <a href="mailto:philip.t.jenkins@gmail.com">philip.t.jenkins@gmail.com</a>
         </div>
 		<script type="text/javascript" src="lib/angular.min.js"></script>
-		<script type="text/javascript" src="src-js/meetup.min.js"></script>
+		<script type="text/javascript" src="src-js/meetup.js"></script>
         <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBxt6SwFT6CyZbFBC561_vf-CUEEq76Njk&libraries=places&sensor=false" ></script>
         <script type="text/javascript" src="lib/angular-gm.min.js"></script>
         <script type="text/javascript" src="lib/angularjs-google-places.min.js"></script>
