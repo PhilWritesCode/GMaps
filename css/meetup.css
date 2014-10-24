@@ -259,6 +259,15 @@ a {
 	font-weight: bold;
 }
 
+.desktopAd {
+	display: inline-block;
+	width: 728px;
+	height: 90px;
+}
+
+.mobileAd {
+	display: none;
+}
 
 @media (max-width: 767px) {
 	#resultList {
@@ -281,5 +290,15 @@ a {
     	margin-left: 5px;
     	margin-top: 5px;
     	text-decoration: none;
+    }
+
+    .desktopAd {
+    	display: none;
+    }
+
+    .mobileAd {
+    	display: inline-block;
+    	width: 320px;
+    	height: 100px;
     }
 }
