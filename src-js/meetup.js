@@ -77,7 +77,7 @@
   });
 
   meetupApp.controller('MeetupController', function($scope, $location, $anchorScroll, locationService) {
-    var isHalfwayHangout, updateResultsMarkers;
+    var isHalfwayHangout, pendingLocations, processNextPendingLocation, updateResultsMarkers;
     this.locationMarkers = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'];
     this.clickDisablingNodes = ['SELECT', 'A', 'INPUT'];
     this.locations = [];
@@ -89,6 +89,7 @@
     this.searchPages = [];
     this.searchPageIndex = 0;
     this.searchPaginationObject;
+    pendingLocations = [];
     this.processLocationFormEntry = function() {
       if (this.locationFormEntry) {
         locationService.processLocation(this.locationFormEntry, this.centerOfSearchArea, this.addLocation);
@@ -103,6 +104,12 @@
           _this.performSearch();
           return $scope.$apply();
         }
+      };
+    })(this);
+    processNextPendingLocation = (function(_this) {
+      return function() {
+        _this.locationFormEntry = pendingLocations.pop();
+        return _this.processLocationFormEntry();
       };
     })(this);
     this.locationAlreadyEntered = function(locationToCheck) {
@@ -179,7 +186,10 @@
           _this.searchPageIndex++;
         }
         _this.updateMapSearchResults();
-        return $scope.$apply();
+        $scope.$apply();
+        if (pendingLocations.length > 0) {
+          return processNextPendingLocation();
+        }
       };
     })(this);
     updateResultsMarkers = (function(_this) {
@@ -247,10 +257,10 @@
     this.toggleSelection = function(result) {
       if (result.selected) {
         this.deSelectResult(result);
-        return this.triggerCloseInfoWindow(result);
+        return this.triggerCloseResultsInfoWindow(result);
       } else {
         this.selectResult(result);
-        return this.triggerOpenInfoWindow(result);
+        return this.triggerOpenResultsInfoWindow(result);
       }
     };
     this.handleTextEntryClicked = function(result, event) {
@@ -261,19 +271,19 @@
         return this.toggleSelection(result);
       }
     };
-    this.triggerOpenInfoWindow = function(result) {
+    this.triggerOpenResultsInfoWindow = function(result) {
       return this.markerEvents = [
         {
-          event: 'openinfowindow',
-          ids: ['result' + result.formatted_address]
+          event: 'openresultsinfowindow',
+          ids: ['result' + result.place_id]
         }
       ];
     };
-    this.triggerCloseInfoWindow = function(result) {
+    this.triggerCloseResultsInfoWindow = function(result) {
       return this.markerEvents = [
         {
-          event: 'closeinfowindow',
-          ids: ['result' + result.formatted_address]
+          event: 'closeresultsinfowindow',
+          ids: ['result' + result.place_id]
         }
       ];
     };
@@ -353,6 +363,30 @@
     this.scrollTo = function(anchorTagId) {
       $location.hash(anchorTagId);
       return $anchorScroll();
+    };
+    this.initController = function() {
+      var searchParams;
+      searchParams = $location.search();
+      if (searchParams.search) {
+        this.searchTerm = searchParams.search;
+      }
+      if (searchParams.locations) {
+        pendingLocations = searchParams.locations.split(":");
+        return processNextPendingLocation();
+      }
+    };
+    this.generatePermalink = function() {
+      return $location.protocol() + "://" + $location.host() + $location.path() + "?search=" + this.searchTerm + "&locations=" + this.locationsToDelimitedString();
+    };
+    this.locationsToDelimitedString = function() {
+      var location, locationString, _i, _len, _ref;
+      locationString = "";
+      _ref = this.locations;
+      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+        location = _ref[_i];
+        locationString += this.getNormalizedAddress(location) + ":";
+      }
+      return locationString.slice(0, -1);
     };
     this.getMapLocationOptions = function(result) {
       return angular.extend(this.mapLocationOptions, {

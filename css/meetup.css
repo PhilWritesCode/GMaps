@@ -43,6 +43,14 @@ a {
 	padding: 0px 20px 20px 20px;
 }
 
+.instructions > p {
+	padding-bottom: 20px;
+}
+
+.instructions.results {
+	margin-top: 75px;
+}
+
 .greenArrowText {
 	color: #66bd49;
 	font-weight:bold;
@@ -203,6 +211,10 @@ a {
 	height: 100px;
 }
 
+.infoPopup.greenArrowPopup {
+	height: 50px;
+}
+
 .directionLocationSelector {
 	padding: 0px;
 	margin-bottom: 0px;
@@ -241,6 +253,10 @@ a {
 .jumpToTopLink {
 	font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
 	float: right;
+}
+
+.bold {
+	font-weight: bold;
 }
 
 

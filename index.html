@@ -13,7 +13,7 @@
         <link rel="stylesheet" type="text/css" href="http://netdna.bootstrapcdn.com/font-awesome/3.2.1/css/font-awesome.css" >
         <link rel="shortcut icon" href="{{meetup.getFavIcon()}}">
 	</head>
-	<body ng-controller="MeetupController as meetup">
+	<body ng-controller="MeetupController as meetup" ng-init="meetup.initController()">
         <div class="container-fluid">
             <div class="row-fluid">
                 <div id="header" class="span12 titleHeader page-header" >
@@ -44,13 +44,12 @@
                             </div>
                         </form>
                         <div ng-show="meetup.locations.length == 0" class="instructions">
-                            <p>Enter the starting location for each member of your group, one at a time, in the box above.</p>
-                        </div>
-                        <div ng-show="meetup.locations.length == 0" class="instructions">
+                            <p>Enter the starting location for each member of your group, one at a time, in the box above.  You can use a full address, a zip code, a city name, or even just cross streets -- we'll do our best find it.</p>
                             <p>Then, enter the type of place you'd like to go ('coffee', 'movie theater', 'Italian food', etc.) in the search box above the map, and click Go!</p>
+                            <p>{{meetup.getPageTitle()}} will find places where all of your friends can {{meetup.getMeetupNomenclature()}} and display them on the map!</p>
                         </div>
-                        <div ng-show="meetup.locations.length == 0" class="instructions">
-                            <p>{{meetup.getPageTitle()}} will find places where all of your friends can {{meetup.getMeetupNomenclature()}}!</p>
+                        <div ng-show="meetup.locations.length > 0" class="instructions">
+                            <p>Are there more people in your group?  Continue to add locations in the box above!</p>
                         </div>
                     </div>
                     <div class="span6">
@@ -65,10 +64,10 @@
                             </div>
                         </form>
                         <div id="map_canvas">
-                            <div gm-info-window="infoWindow" class="infoWindow well infoPopup"
+                            <div gm-info-window="resultsInfoWindow" class="infoWindow well infoPopup"
                                  gm-on-closeclick="meetup.deSelectResult(selectedLocation)">
                                 <h4><a target="_blank" href="{{selectedLocation.url}}">{{selectedLocation.name}}</a></h4>
-                                <div class="text-place-summary-details" >
+                                <div class="text-place-summary-details">
                                     <div class="text-place-basic-details" >
                                         <div class="text-place-address">{{meetup.getNormalizedAddress(selectedLocation) }}</div>
                                         <div class="text-place-phone">{{selectedLocation.formatted_phone_number}}</div>
@@ -85,18 +84,18 @@
                                             gm-marker-options="meetup.getMapLocationOptions(object)">
                                 </gm-markers>
                                 <gm-markers gm-objects="meetup.centerOfSearchArea"
-                                            gm-id="searchAreaMarker"
+                                            gm-id="centerMarker"
                                             gm-position="{lat: meetup.centerOfSearchArea.lat(), lng: meetup.centerOfSearchArea.lng()}"
                                             gm-marker-options="meetup.getMapSearchAreaOptions()"
                                             gm-on-dragend="meetup.updateSearchArea(object, marker)">
                                 </gm-markers>
                                 <gm-markers gm-objects="meetup.getDisplayedResults()"
-                                            gm-id="'result' + object.formatted_address"
+                                            gm-id="'result' + object.place_id"
                                             gm-position="{lat: object.geometry.location.lat(), lng: object.geometry.location.lng()}"
                                             gm-marker-options="meetup.getMapSearchResultsOptions(object)"
                                             gm-events="meetup.markerEvents"
-                                            gm-on-openinfowindow="selectedLocation = object; infoWindow.open(marker.getMap(), marker)"
-                                            gm-on-closeinfowindow="selectedLocation = null; infoWindow.close()"
+                                            gm-on-openresultsinfowindow="selectedLocation = object; resultsInfoWindow.open(marker.getMap(), marker)"
+                                            gm-on-closeresultsinfowindow="selectedLocation = null; resultsInfoWindow.close()"
                                             gm-on-click="meetup.toggleSelection(object)"
                                             gm-on-mouseover="meetup.highlightResult(object)"
                                             gm-on-mouseout="meetup.unHighlightResult(object)">
@@ -104,20 +103,22 @@
                             </gm-map>
                         </div>
                         <div ng-show="meetup.locations.length > 0" class="">
-                            <p>Drag the <span class="greenArrowText">green arrow</span> to refine your search area!</p>
+                            <p>Drag the <span class="greenArrowText">green arrow</span> to refine your search area!  For example, drag it to a highway or major road.</p>
                         </div>
 
                     </div>
                     <div class="span3">
                         <div id="results"></div>
-
+                        <div ng-show="meetup.locations.length == 0" class="instructions results">
+                            <p>Once you've entered your locations, and told us what kind of place you'd like to go to, we'll list your results here.</p>
+                            <p>Clicking on a result will highlight it on the map, and will give you the option to read reviews, visit their website, or even get directions!</p>
+                        </div>
                         <div ng-show="meetup.getDisplayedResults().length > 0" class="resultsLabel">
                             <h2 class="resultsHeader">Results</h2>
                             <div class="jumpToLink" ng-show="meetup.getDisplayedResults().length > 0">
                                 <a class="jumpToTopLink" ng-click="meetup.scrollTo('header')">&#x25B2;Jump to Top</a>
                             </div>
                         </div>
-
                         <div id="resultList" ng-controller="ResultListController as resultCtrl" ng-show="meetup.getDisplayedResults()" class="text-mode-right">
                             <div ng-repeat="result in meetup.getDisplayedResults()" class="text-place"
                                  scroll-if="result.selected"
@@ -157,7 +158,7 @@
                                             <span class="text-place-website"><a target="_blank" href="{{result.website}}">{{meetup.getBaseUrl(result.website)}}</a></span>
                                         </div>
                                         <div class="text-place-hours" ng-show="result.opening_hours && result.opening_hours.periods">
-                                            <span>Today's hours:</span>
+                                            <span class="bold">Today's hours:</span>
                                             <div class="text-place-open-hours">
                                                 {{resultCtrl.getHoursForToday(result)}}
                                             </div>
@@ -170,7 +171,7 @@
                                                   ng-submit="resultCtrl.getDirections(fromLocation, result)"
                                                   class="getDirectionsForm"
                                                   ng-init="fromLocation = meetup.locations[0]">
-                                                <label class="directionFormLabel">Get directions from</label>
+                                                <label class="directionFormLabel"><span class="bold">Get directions</span> from</label>
                                                 <select ng-model="fromLocation"
                                                         class="directionLocationSelector"
                                                         ng-options="meetup.getNormalizedAddress(location) for  location in meetup.locations"></select>

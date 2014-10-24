@@ -60,6 +60,7 @@ meetupApp.controller 'MeetupController', ($scope, $location, $anchorScroll, loca
 	@searchPages = []
 	@searchPageIndex = 0
 	@searchPaginationObject
+	pendingLocations = []
 
 	@processLocationFormEntry = ->
 		if @locationFormEntry
@@ -72,6 +73,10 @@ meetupApp.controller 'MeetupController', ($scope, $location, $anchorScroll, loca
 			@updateMapLocations()
 			@performSearch()
 			$scope.$apply()
+
+	processNextPendingLocation = =>
+		@locationFormEntry = pendingLocations.pop()
+		@processLocationFormEntry()
 
 	@locationAlreadyEntered = (locationToCheck) ->
 		for location in @locations
@@ -119,6 +124,8 @@ meetupApp.controller 'MeetupController', ($scope, $location, $anchorScroll, loca
 			@searchPageIndex++
 		@updateMapSearchResults()
 		$scope.$apply()
+		if(pendingLocations.length > 0)
+			processNextPendingLocation();
 
 	updateResultsMarkers = =>
 		$scope.$broadcast('gmMarkersUpdate', 'meetup.getDisplayedResults()');
@@ -169,21 +176,21 @@ meetupApp.controller 'MeetupController', ($scope, $location, $anchorScroll, loca
 	@toggleSelection = (result) ->
 		if result.selected
 			@deSelectResult result
-			@triggerCloseInfoWindow result
+			@triggerCloseResultsInfoWindow result
 		else
 			@selectResult result
-			@triggerOpenInfoWindow result
+			@triggerOpenResultsInfoWindow result
 
 	@handleTextEntryClicked = (result, event) ->
 		if event.target.nodeName in @clickDisablingNodes
 		else
 			@toggleSelection(result)
 
-	@triggerOpenInfoWindow = (result) ->
-    		@markerEvents = [{event: 'openinfowindow',ids: ['result' + result.formatted_address]}];
+	@triggerOpenResultsInfoWindow = (result) ->
+		@markerEvents = [{event: 'openresultsinfowindow',ids: ['result' + result.place_id]}];
 
-	@triggerCloseInfoWindow = (result) ->
-    		@markerEvents = [{event: 'closeinfowindow',ids: ['result' + result.formatted_address]}];
+	@triggerCloseResultsInfoWindow = (result) ->
+		@markerEvents = [{event: 'closeresultsinfowindow',ids: ['result' + result.place_id]}];
 
 	@getNormalizedAddress = (location) ->
 		if location
@@ -251,6 +258,23 @@ meetupApp.controller 'MeetupController', ($scope, $location, $anchorScroll, loca
 		$location.hash anchorTagId
 		$anchorScroll()
 
+	@initController = ->
+		searchParams = $location.search()
+		if searchParams.search
+			@searchTerm = searchParams.search
+		if searchParams.locations
+			pendingLocations = searchParams.locations.split(":")
+			processNextPendingLocation()
+
+	@generatePermalink = ->
+		$location.host() + "?search=" + @searchTerm + "&locations=" + @locationsToDelimitedString()
+
+	@locationsToDelimitedString = ->
+		locationString = ""
+		for location in @locations
+			locationString += @getNormalizedAddress(location) + ":"
+		return locationString.slice(0,-1)
+
 	@getMapLocationOptions = (result) ->
 		angular.extend( @mapLocationOptions,
 			{icon: "http://maps.google.com/mapfiles/marker_grey" + @locationMarkers[@locations.indexOf(result)] + ".png"}
@@ -281,6 +305,7 @@ meetupApp.controller 'MeetupController', ($scope, $location, $anchorScroll, loca
 	@mapLocationOptions = {draggable: false}
 	@searchResultOptions = {draggable: false, clickable: true}
 	@mapHiddenMarkersOptions = {visible: false}
+
 
 meetupApp.controller 'ResultListController', ($scope) ->
 
