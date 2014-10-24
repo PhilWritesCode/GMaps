@@ -183,7 +183,8 @@
                                 </div>
                                 <img ng-show="result.photos[0]"
                                      ng-src="{{result.photos[0].getUrl({'maxWidth': 90, 'maxHeight': 90})}}"
-                                     class="text-place-thumbnail"/>
+                                     class="text-place-thumbnail"
+                                     alt="Thumbnail image"/>
                             </div>
                             <div class="text-place-pagination">
                                 <a ng-show="meetup.searchPageIndex > 0" class="text-place-pagination-button" ng-click="meetup.getPreviousPage()">&#171;</a>
