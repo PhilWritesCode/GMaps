@@ -51,10 +51,6 @@
                         <div ng-show="meetup.locations.length > 0" class="instructions">
                             <p>Are there more people in your group?  Continue to add locations in the box above!</p>
                         </div>
-                        <div class="instructions">
-                            <p><span class="bold">{{meetup.getPageTitle()}} is currently in open beta.</span>  If you have a moment, please fill out a short survey <a target="_blank" href="https://www.surveymonkey.com/s/8MBFK5J">here</a>.  Your feedback will help us to make improvements and add the features that you want.</p>
-                            <p><span class="bold">Thank you!</span></p>
-                        </div>
                     </div>
                     <div class="span6">
                         <label class="label label-info" style="padding-right: 5px">What do you want to do?</label>
@@ -196,6 +192,14 @@
                                 <span> Showing results {{meetup.getSearchResultPageNumbers()}}</span>
                                 <a ng-show="meetup.nextPageAvailable()" class="text-place-pagination-button" ng-click="meetup.getNextPage()">&#187;</a>
                             </div>
+                            <div class="instructions">
+                                <p><span class="bold">{{meetup.getPageTitle()}} is currently in open beta.</span>  If you have a moment, please fill out a short survey <a target="_blank" href="https://www.surveymonkey.com/s/8MBFK5J">here</a>.  Your feedback will help us to make improvements and add the features that you want.</p>
+                                <p><span class="bold">Thank you!</span></p>
+                            </div>
+                        </div>
+                        <div class="instructions" ng-show="meetup.locations.length == 0">
+                            <p><span class="bold">{{meetup.getPageTitle()}} is currently in open beta.</span>  If you have a moment, please fill out a short survey <a target="_blank" href="https://www.surveymonkey.com/s/8MBFK5J">here</a>.  Your feedback will help us to make improvements and add the features that you want.</p>
+                            <p><span class="bold">Thank you!</span></p>
                         </div>
                     </div>
                 </div>
