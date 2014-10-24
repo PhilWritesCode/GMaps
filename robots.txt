@@ -1,2 +1,5 @@
 User-Agent: *
-Disallow: /src-js/
+Disallow: /src-js
+Disallow: /img
+Disallow: /lib
+Disallow: /css
