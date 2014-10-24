@@ -3,7 +3,9 @@
 	<head ng-controller="MeetupController as meetup">
 		<title>{{meetup.getPageTitle()}} | {{meetup.getPageSubTitle()}}</title>
         <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
-
+        <meta name="description" content="This site allows users to enter their address, along with the addresses of their friends, and find meetup locations at the midpoint of those addresses.">
+        <meta name="keywords" content="meetup,hangout,middle,halfway,bars,restaurants,bored,local,movies,fun,maps,google">
+        <meta name="author" content="Phil Jenkins">
 
         <link rel="stylesheet" type="text/css" href="css/bootstrap.min.css">
         <link rel="stylesheet" type="text/css" href="css/bootstrap-responsive.min.css">
@@ -209,6 +211,7 @@
               a.async=1;a.src=g;m.parentNode.insertBefore(a,m)})(window,document,'script',
               '//www.google-analytics.com/analytics.js','ga');
               ga('create', 'UA-55679545-1', 'auto');
+              ga('require', 'displayfeatures');
               ga('send', 'pageview');
         </script>
 	</body>
