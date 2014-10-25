@@ -118,10 +118,14 @@ meetupApp.controller 'MeetupController', ($scope, $location, $anchorScroll, loca
 
 	@displayResults = (results, pagination) =>
 		@searchPaginationObject = pagination
+
 		@searchPages.push results.slice(0,10)
-		@searchPages.push results.slice(10)
+		if results.length > 10
+			@searchPages.push results.slice(10)
+
 		if @searchPages.length > 2
 			@searchPageIndex++
+
 		@updateMapSearchResults()
 		$scope.$apply()
 		if(pendingLocations.length > 0)

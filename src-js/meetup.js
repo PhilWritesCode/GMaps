@@ -181,7 +181,9 @@
       return function(results, pagination) {
         _this.searchPaginationObject = pagination;
         _this.searchPages.push(results.slice(0, 10));
-        _this.searchPages.push(results.slice(10));
+        if (results.length > 10) {
+          _this.searchPages.push(results.slice(10));
+        }
         if (_this.searchPages.length > 2) {
           _this.searchPageIndex++;
         }
@@ -376,7 +378,7 @@
       }
     };
     this.generatePermalink = function() {
-      return $location.protocol() + "://" + $location.host() + $location.path() + "?search=" + this.searchTerm + "&locations=" + this.locationsToDelimitedString();
+      return $location.host() + "?search=" + this.searchTerm + "&locations=" + this.locationsToDelimitedString();
     };
     this.locationsToDelimitedString = function() {
       var location, locationString, _i, _len, _ref;
