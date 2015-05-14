@@ -34,3 +34,13 @@ Icon
 # Files that might appear on external disk
 .Spotlight-V100
 .Trashes
+
+#Project folders
+.idea/
+.settings/
+
+#Project files
+*.project
+*.iml
+*.sublime-project
+*.sublime-workspace
