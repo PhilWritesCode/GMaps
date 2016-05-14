@@ -1,4 +1,4 @@
-meetupApp = angular.module 'meetupApp', ['AngularGM','ngGPlaces','ngAutocomplete']
+meetupApp = angular.module 'meetupApp', ['AngularGM','ngGPlaces','ngRoute','ngAutocomplete']
 
 meetupApp.factory 'locationService', ->
 	@geocoder = new google.maps.Geocoder()
@@ -48,7 +48,7 @@ meetupApp.factory 'locationService', ->
 	{@processLocation, @performSearch, @getLocationDetails}
 
 
-meetupApp.controller 'MeetupController', ($scope, $location, $anchorScroll, locationService) ->
+meetupApp.controller 'MeetupController', ($scope, $location, $anchorScroll, $routeParams, locationService) ->
 	@locationMarkers = ['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z']
 	@clickDisablingNodes = ['SELECT', 'A', 'INPUT']
 	@locations = []
@@ -264,6 +264,7 @@ meetupApp.controller 'MeetupController', ($scope, $location, $anchorScroll, loca
 
 	@initController = ->
 		searchParams = $location.search()
+		params2 = $routeParams
 		if searchParams.search
 			@searchTerm = searchParams.search
 		if searchParams.locations
