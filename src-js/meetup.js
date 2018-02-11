@@ -3,7 +3,7 @@
   var meetupApp,
     __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; };
 
-  meetupApp = angular.module('meetupApp', ['AngularGM', 'ngGPlaces', 'ngAutocomplete']);
+  meetupApp = angular.module('meetupApp', ['AngularGM', 'ngGPlaces', 'ngRoute', 'ngAutocomplete']);
 
   meetupApp.factory('locationService', function() {
     this.geocoder = new google.maps.Geocoder();
@@ -76,7 +76,7 @@
     };
   });
 
-  meetupApp.controller('MeetupController', function($scope, $location, $anchorScroll, locationService) {
+  meetupApp.controller('MeetupController', function($scope, $location, $anchorScroll, $routeParams, locationService) {
     var isHalfwayHangout, pendingLocations, processNextPendingLocation, updateResultsMarkers;
     this.locationMarkers = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'];
     this.clickDisablingNodes = ['SELECT', 'A', 'INPUT'];
@@ -367,8 +367,9 @@
       return $anchorScroll();
     };
     this.initController = function() {
-      var searchParams;
+      var params2, searchParams;
       searchParams = $location.search();
+      params2 = $routeParams;
       if (searchParams.search) {
         this.searchTerm = searchParams.search;
       }

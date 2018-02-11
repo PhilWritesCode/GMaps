@@ -44,3 +44,5 @@ Icon
 *.iml
 *.sublime-project
 *.sublime-workspace
+.idea/workspace.xml
+src-js/meetup.mid.js
