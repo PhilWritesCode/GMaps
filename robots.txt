@@ -3,3 +3,4 @@ Disallow: /src-js
 Disallow: /img
 Disallow: /lib
 Disallow: /css
+Disallow: /src-coffee
